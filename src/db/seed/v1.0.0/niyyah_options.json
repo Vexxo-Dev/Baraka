@@ -1,0 +1,551 @@
+[
+  {
+    "id": "eating_1",
+    "activity_id": "eating",
+    "text_en": "I begin my meal with Bismillah and eat with my right hand, following the Sunnah of the Prophet Mohamed ﷺ.",
+    "text_ar": "أبدأ طعامي ببسم الله، وآكل بيميني؛ اقتداءً بسنة النبي ﷺ.",
+    "source_en": null,
+    "source_ar": null,
+    "sort_order": 1
+  },
+  {
+    "id": "eating_2",
+    "activity_id": "eating",
+    "text_en": "I eat this to provide for myself and those I love, knowing every bite I place for my family is counted as sadaqah.",
+    "text_ar": "آكل هذا الطعام لأتقوّى على النفقة على نفسي وأهلي، موقناً أن ما أُطعمه لأهلي يُكتب لي به أجرٌ وصدقة.",
+    "source_en": null,
+    "source_ar": null,
+    "sort_order": 2
+  },
+  {
+    "id": "eating_3",
+    "activity_id": "eating",
+    "text_en": "I praise Allah when I finish, knowing a single meal eaten with gratitude earns His pleasure.",
+    "text_ar": "أختم طعامي بحمد الله، موقناً أن الله يرضى عن العبد إذا أكل الأكلة فحمده عليها.",
+    "source_en": null,
+    "source_ar": null,
+    "sort_order": 3
+  },
+  {
+    "id": "eating_4",
+    "activity_id": "eating",
+    "text_en": "I eat enough to keep me going, no more, a third for food, a third for drink, a third for air.",
+    "text_ar": "آكل بقدر حاجتي، ولا أُسرف؛ فثلثٌ للطعام، وثلثٌ للشراب، وثلثٌ للنَّفَس.",
+    "source_en": null,
+    "source_ar": null,
+    "sort_order": 4
+  },
+  {
+    "id": "eating_5",
+    "activity_id": "eating",
+    "text_en": "I gather my family around this table if I can, knowing eating together brings blessing to the meal.",
+    "text_ar": "أجمع أهلي على المائدة إن استطعت، موقناً أن الاجتماع على الطعام سببٌ لحلول البركة.",
+    "source_en": null,
+    "source_ar": null,
+    "sort_order": 5
+  },
+  {
+    "id": "cooking_paradise",
+    "activity_id": "cooking",
+    "text_en": "I feed others and spread peace, seeking to enter Paradise in peace as the Prophet ﷺ promised.",
+    "text_ar": "أُطعم الطعام وأُفشي السلام، راجياً أن أدخل الجنة بسلام كما وعد النبي ﷺ.",
+    "source_en": "Abdullah bin Amr - Tirmidhi 1855",
+    "source_ar": "عبد الله بن عمرو - الترمذي ١٨٥٥",
+    "sort_order": 6
+  },
+  {
+    "id": "cooking_charity",
+    "activity_id": "cooking",
+    "text_en": "I feed them purely for the sake of Allah, desiring neither reward nor thanks from them.",
+    "text_ar": "إِنَّمَا نُطْعِمُكُمْ لِوَجْهِ اللَّهِ لَا نُرِيدُ مِنْكُمْ جَزَاءً وَلَا شُكُورًا.",
+    "source_en": "Surah Al-Insan: 9",
+    "source_ar": "سورة الإنسان: ٩",
+    "sort_order": 7
+  },
+  {
+    "id": "cooking_neighbor",
+    "activity_id": "cooking",
+    "text_en": "I cook this meal intending to share a portion with my neighbor, following the Sunnah.",
+    "text_ar": "أطبخ هذا الطعام بنية إكثار مرقه لمناولة جاري منه، اتباعاً للسنة.",
+    "source_en": "Abu Dharr - Sahih Muslim 2625b",
+    "source_ar": "أبو ذر - صحيح مسلم ٢٦٢٥ب",
+    "sort_order": 8
+  },
+  {
+    "id": "cooking_servant",
+    "activity_id": "cooking",
+    "text_en": "I invite the one who helped prepare this food to eat with us, honoring their effort.",
+    "text_ar": "أُجلس من صنع لي هذا الطعام ليأكل معي، تقديراً لجهده وحرّه.",
+    "source_en": "Abu Huraira - Bukhari 5460",
+    "source_ar": "أبو هريرة - البخاري ٥٤٦٠",
+    "sort_order": 9
+  },
+  {
+    "id": "exercise_1",
+    "activity_id": "exercise",
+    "text_en": "I train my body so it helps me stand longer in prayer, fast without fatigue, and make Hajj with ease.",
+    "text_ar": "أدرِّب جسدي ليعينني على إطالة القيام في الصلاة، والصيام بقوة، وأداء الحج بيسر.",
+    "source_en": null,
+    "source_ar": null,
+    "sort_order": 10
+  },
+  {
+    "id": "exercise_2",
+    "activity_id": "exercise",
+    "text_en": "This body is Allah's trust in my hands. Moving it is how I say thank You.",
+    "text_ar": "جسدي أمانةٌ من الله بين يدي، ومحافظتي عليه وتقويته من شكر هذه النعمة.",
+    "source_en": null,
+    "source_ar": null,
+    "sort_order": 11
+  },
+  {
+    "id": "exercise_3",
+    "activity_id": "exercise",
+    "text_en": "The Prophet Mohamed ﷺ said the strong believer is more beloved to Allah, so I train to be counted among them.",
+    "text_ar": "قال رسول الله ﷺ: «المؤمن القوي خيرٌ وأحبُّ إلى الله من المؤمن الضعيف». فأتدرَّب لأكون من المؤمنين الأقوياء.",
+    "source_en": null,
+    "source_ar": null,
+    "sort_order": 12
+  },
+  {
+    "id": "exercise_4",
+    "activity_id": "exercise",
+    "text_en": "I clear my mind and renew my energy, so I return to my work and worship with full presence.",
+    "text_ar": "أجدِّد نشاطي وأصفِّي ذهني، ثم أعود إلى عملي وعبادتي بقلبٍ حاضرٍ وهمَّةٍ متجددة.",
+    "source_en": null,
+    "source_ar": null,
+    "sort_order": 13
+  },
+  {
+    "id": "work_1",
+    "activity_id": "work",
+    "text_en": "I work knowing what I provide for my family is counted as sadaqah.",
+    "text_ar": "أعمل وأنا أعلم أن ما أنفقه على عائلتي يُحتسب صدقة.",
+    "source_en": null,
+    "source_ar": null,
+    "sort_order": 14
+  },
+  {
+    "id": "work_2",
+    "activity_id": "work",
+    "text_en": "I work to stay independent, not leaning on others, keeping my dignity.",
+    "text_ar": "أعمل لأبقى مستقلاً، لا أتكل على غيري، وأحفظ كرامتي.",
+    "source_en": null,
+    "source_ar": null,
+    "sort_order": 15
+  },
+  {
+    "id": "work_3",
+    "activity_id": "work",
+    "text_en": "I set some of today's earnings aside for zakat and good causes.",
+    "text_ar": "أخصّص جزءاً من كسب اليوم للزكاة والأعمال الخيرية.",
+    "source_en": null,
+    "source_ar": null,
+    "sort_order": 16
+  },
+  {
+    "id": "work_4",
+    "activity_id": "work",
+    "text_en": "I work in a way that benefits others, not just myself.",
+    "text_ar": "أعمل بطريقة تفيد غيري، لا نفسي فقط.",
+    "source_en": null,
+    "source_ar": null,
+    "sort_order": 17
+  },
+  {
+    "id": "work_professional_1",
+    "activity_id": "work",
+    "text_en": "I work with honesty and excellence, treating it as worship.",
+    "text_ar": "أعمل بأمانة وإتقان، وأعتبره عبادة.",
+    "source_en": null,
+    "source_ar": null,
+    "sort_order": 18
+  },
+  {
+    "id": "work_professional_2",
+    "activity_id": "work",
+    "text_en": "I spend part of what I earn in Allah's path, through zakat and sadaqah.",
+    "text_ar": "أنفق جزءاً مما أكسبه في سبيل الله، بالزكاة والصدقة.",
+    "source_en": null,
+    "source_ar": null,
+    "sort_order": 19
+  },
+  {
+    "id": "work_professional_3",
+    "activity_id": "work",
+    "text_en": "I earn halal provision for my family, knowing every dirham I spend on them is sadaqah.",
+    "text_ar": "أكسب الرزق الحلال لأسرتي، موقناً أن كل درهم أنفقه عليهم صدقة.",
+    "source_en": null,
+    "source_ar": null,
+    "sort_order": 20
+  },
+  {
+    "id": "cleaning_1",
+    "activity_id": "cleaning",
+    "text_en": "I clean this space so it's ready for worship.",
+    "text_ar": "أنظّف هذا المكان ليكون جاهزاً للعبادة.",
+    "source_en": null,
+    "source_ar": null,
+    "sort_order": 21
+  },
+  {
+    "id": "cleaning_2",
+    "activity_id": "cleaning",
+    "text_en": "I clean with kindness and sincerity, as a service to my family.",
+    "text_ar": "أنظّف بطيب نفس وإخلاص، كخدمة لعائلتي.",
+    "source_en": null,
+    "source_ar": null,
+    "sort_order": 22
+  },
+  {
+    "id": "cleaning_3",
+    "activity_id": "cleaning",
+    "text_en": "I clean today, knowing purity is half of faith.",
+    "text_ar": "أنظّف اليوم، موقناً أن الطهور شطر الإيمان.",
+    "source_en": null,
+    "source_ar": null,
+    "sort_order": 23
+  },
+  {
+    "id": "cleaning_4",
+    "activity_id": "cleaning",
+    "text_en": "I clean alongside my children, teaching them order as I go.",
+    "text_ar": "أنظّف مع أطفالي، وأعلّمهم النظام وأنا أفعل ذلك.",
+    "source_en": null,
+    "source_ar": null,
+    "sort_order": 24
+  },
+  {
+    "id": "cleaning_homemaker_1",
+    "activity_id": "cleaning",
+    "text_en": "I keep this home a blessed place, fit for worship.",
+    "text_ar": "أحافظ على هذا البيت مكاناً مباركاً يليق بالعبادة.",
+    "source_en": null,
+    "source_ar": null,
+    "sort_order": 25
+  },
+  {
+    "id": "cleaning_parent_1",
+    "activity_id": "cleaning",
+    "text_en": "I clean today, raising children who value order and purity.",
+    "text_ar": "أنظّف اليوم، وأربّي أطفالاً يقدّرون النظام والطهارة.",
+    "source_en": null,
+    "source_ar": null,
+    "sort_order": 26
+  },
+  {
+    "id": "sleep_1",
+    "activity_id": "sleep",
+    "text_en": "I set my intention now to wake for Tahajjud.",
+    "text_ar": "أعقد نيتي الآن على الاستيقاظ لصلاة التهجد.",
+    "source_en": null,
+    "source_ar": null,
+    "sort_order": 27
+  },
+  {
+    "id": "sleep_2",
+    "activity_id": "sleep",
+    "text_en": "I sleep tonight knowing my health is a trust from Allah.",
+    "text_ar": "أنام الليلة وأنا أعلم أن صحتي أمانة من الله.",
+    "source_en": null,
+    "source_ar": null,
+    "sort_order": 28
+  },
+  {
+    "id": "sleep_3",
+    "activity_id": "sleep",
+    "text_en": "I make wudu, lie on my right side, and say the Sunnah dua before I sleep.",
+    "text_ar": "أتوضأ، وأضطجع على شقي الأيمن، وأقول دعاء النوم السني قبل أن أنام.",
+    "source_en": null,
+    "source_ar": null,
+    "sort_order": 29
+  },
+  {
+    "id": "sleep_4",
+    "activity_id": "sleep",
+    "text_en": "I sleep with this intention, knowing the reward is counted like a night of worship.",
+    "text_ar": "أنام بهذه النية، موقناً أن الأجر يُحتسب كليلة من العبادة.",
+    "source_en": null,
+    "source_ar": null,
+    "sort_order": 30
+  },
+  {
+    "id": "fajr_1",
+    "activity_id": "fajr",
+    "text_en": "I pray Fajr now and start my day under Allah's protection.",
+    "text_ar": "أصلي الفجر الآن وأبدأ يومي في حفظ الله.",
+    "source_en": null,
+    "source_ar": null,
+    "sort_order": 31
+  },
+  {
+    "id": "fajr_2",
+    "activity_id": "fajr",
+    "text_en": "I pray now, knowing the dawn prayer is a moment the angels themselves witness.",
+    "text_ar": "أصلي الآن، موقناً أن صلاة الفجر لحظة يشهدها الملائكة أنفسهم.",
+    "source_en": null,
+    "source_ar": null,
+    "sort_order": 32
+  },
+  {
+    "id": "fajr_3",
+    "activity_id": "fajr",
+    "text_en": "I don't skip the two Sunnah rak'ahs before Fajr. They outweigh everything in this world.",
+    "text_ar": "لا أفوّت ركعتي سنة الفجر. هما خيرٌ من الدنيا وما فيها.",
+    "source_en": null,
+    "source_ar": null,
+    "sort_order": 33
+  },
+  {
+    "id": "dhuhur_1",
+    "activity_id": "dhuhur",
+    "text_en": "I pause now and ask forgiveness for any shortcomings since the morning.",
+    "text_ar": "أتوقف الآن وأستغفر عن أي تقصير منذ الصباح.",
+    "source_en": null,
+    "source_ar": null,
+    "sort_order": 34
+  },
+  {
+    "id": "dhuhur_2",
+    "activity_id": "dhuhur",
+    "text_en": "I pray now and renew my gratitude for a productive morning.",
+    "text_ar": "أصلي الآن وأجدد شكري على صباح مثمر.",
+    "source_en": null,
+    "source_ar": null,
+    "sort_order": 35
+  },
+  {
+    "id": "asr_1",
+    "activity_id": "asr",
+    "text_en": "I don't delay Asr. The angels of the day shift are about to ascend, and I let them find me praying.",
+    "text_ar": "لا أؤخر صلاة العصر. ملائكة النهار على وشك الصعود، فأدعهم يجدونني أصلي.",
+    "source_en": null,
+    "source_ar": null,
+    "sort_order": 36
+  },
+  {
+    "id": "asr_2",
+    "activity_id": "asr",
+    "text_en": "Nations before us were given this prayer and wasted it, so I earn it twice: once for praying it, once for guarding what they lost.",
+    "text_ar": "لأن أمماً قبلنا أُعطيت هذه الصلاة فضيّعوها، فلي أجران: مرة على صلاتي، ومرة على حفظ ما ضيّعوه.",
+    "source_en": null,
+    "source_ar": null,
+    "sort_order": 37
+  },
+  {
+    "id": "asr_3",
+    "activity_id": "asr",
+    "text_en": "I pray it now, mindful that whoever misses it is as if he lost his family and everything he owns.",
+    "text_ar": "أصليها الآن، مستحضراً أن من فاتته فكأنما خسر أهله وماله.",
+    "source_en": null,
+    "source_ar": null,
+    "sort_order": 38
+  },
+  {
+    "id": "asr_4",
+    "activity_id": "asr",
+    "text_en": "Leaving it wipes out one's deeds, so I hasten to pray before the time passes.",
+    "text_ar": "تركها يُحبط العمل، فأبادر قبل أن يفوت الوقت.",
+    "source_en": null,
+    "source_ar": null,
+    "sort_order": 39
+  },
+  {
+    "id": "maghrib_1",
+    "activity_id": "maghrib",
+    "text_en": "I pray two rak'ahs before it, a small gift the Prophet Mohamed ﷺ recommended.",
+    "text_ar": "أصلي ركعتين قبلها، هدية صغيرة أوصى بها النبي ﷺ.",
+    "source_en": null,
+    "source_ar": null,
+    "sort_order": 40
+  },
+  {
+    "id": "maghrib_2",
+    "activity_id": "maghrib",
+    "text_en": "I gather my family for this prayer, praying together if we can.",
+    "text_ar": "أجمع عائلتي لهذه الصلاة، نصلي معاً إن استطعنا.",
+    "source_en": null,
+    "source_ar": null,
+    "sort_order": 41
+  },
+  {
+    "id": "isha_1",
+    "activity_id": "isha",
+    "text_en": "I pray it in congregation, knowing it counts as half a night of standing in prayer.",
+    "text_ar": "أصليها في جماعة، موقناً أنها تُحتسب كقيام نصف ليلة.",
+    "source_en": null,
+    "source_ar": null,
+    "sort_order": 42
+  },
+  {
+    "id": "isha_2",
+    "activity_id": "isha",
+    "text_en": "I pray now, then prepare my heart for peaceful, grateful sleep.",
+    "text_ar": "أصلي الآن، ثم أهيّئ قلبي لنوم مسالم شاكر.",
+    "source_en": null,
+    "source_ar": null,
+    "sort_order": 43
+  },
+  {
+    "id": "reading_1",
+    "activity_id": "reading",
+    "text_en": "I build a skill today that earns me better halal income.",
+    "text_ar": "أطوّر مهارة اليوم أكسب بها دخلاً حلالاً أفضل.",
+    "source_en": null,
+    "source_ar": null,
+    "sort_order": 44
+  },
+  {
+    "id": "reading_2",
+    "activity_id": "reading",
+    "text_en": "I learn something today and share it, knowing knowledge passed on is ongoing sadaqah.",
+    "text_ar": "أتعلّم شيئاً اليوم وأنشره، موقناً أن العلم الذي يُنقل صدقة جارية.",
+    "source_en": null,
+    "source_ar": null,
+    "sort_order": 45
+  },
+  {
+    "id": "reading_3",
+    "activity_id": "reading",
+    "text_en": "I read to deepen my understanding, of my deen and my world.",
+    "text_ar": "أقرأ لأعمّق فهمي، لديني ودنياي.",
+    "source_en": null,
+    "source_ar": null,
+    "sort_order": 46
+  },
+  {
+    "id": "reading_4",
+    "activity_id": "reading",
+    "text_en": "I seek this knowledge for Allah's sake alone.",
+    "text_ar": "أطلب هذا العلم لوجه الله وحده.",
+    "source_en": null,
+    "source_ar": null,
+    "sort_order": 47
+  },
+  {
+    "id": "reading_student_2",
+    "activity_id": "reading",
+    "text_en": "I learn this so I can put it to use in dawah and serving others.",
+    "text_ar": "أتعلّم هذا لأستخدمه في الدعوة وخدمة الآخرين.",
+    "source_en": null,
+    "source_ar": null,
+    "sort_order": 48
+  },
+  {
+    "id": "reading_student_3",
+    "activity_id": "reading",
+    "text_en": "I read today to strengthen my mind for better ibadah.",
+    "text_ar": "أقرأ اليوم لأقوي عقلي لعبادة أفضل.",
+    "source_en": null,
+    "source_ar": null,
+    "sort_order": 49
+  },
+  {
+    "id": "family_1",
+    "activity_id": "family",
+    "text_en": "I strengthen my family ties today, as Allah commanded me to keep them strong.",
+    "text_ar": "أقوّي صلة رحمي اليوم، كما أوجب الله الحفاظ عليها.",
+    "source_en": null,
+    "source_ar": null,
+    "sort_order": 50
+  },
+  {
+    "id": "family_2",
+    "activity_id": "family",
+    "text_en": "I show my children good character, knowing they learn it from watching me.",
+    "text_ar": "أُري أطفالي حسن الخلق، موقناً أنهم يتعلمونه من مراقبتي.",
+    "source_en": null,
+    "source_ar": null,
+    "sort_order": 51
+  },
+  {
+    "id": "family_3",
+    "activity_id": "family",
+    "text_en": "I'm good to my spouse today, aiming to be among the best to them.",
+    "text_ar": "أُحسن إلى زوجي اليوم، وأسعى لأكون من أفضل الناس له.",
+    "source_en": null,
+    "source_ar": null,
+    "sort_order": 52
+  },
+  {
+    "id": "family_parent_1",
+    "activity_id": "family",
+    "text_en": "I raise my children well, knowing a righteous child keeps making du'a for their parent, even after they're gone.",
+    "text_ar": "أربّي أطفالي جيداً، موقناً أن الولد الصالح يدعو لوالده، حتى بعد رحيله.",
+    "source_en": null,
+    "source_ar": null,
+    "sort_order": 53
+  },
+  {
+    "id": "family_parent_2",
+    "activity_id": "family",
+    "text_en": "I'm patient and kind with my children, treating it as worship.",
+    "text_ar": "أكون لطيفاً وصبوراً مع أطفالي، وأعتبره عبادة.",
+    "source_en": null,
+    "source_ar": null,
+    "sort_order": 54
+  },
+  {
+    "id": "family_parent_3",
+    "activity_id": "family",
+    "text_en": "I teach my children their deen today, through how I live, not just what I say.",
+    "text_ar": "أعلّم أطفالي دينهم اليوم، من خلال سلوكي لا كلامي فقط.",
+    "source_en": null,
+    "source_ar": null,
+    "sort_order": 55
+  },
+  {
+    "id": "charity_1",
+    "activity_id": "charity",
+    "text_en": "I give even a little today, knowing charity extinguishes sins as water extinguishes fire.",
+    "text_ar": "أتصدّق ولو بالقليل اليوم، موقناً أن الصدقة تطفئ الخطيئة كما يطفئ الماء النار.",
+    "source_en": null,
+    "source_ar": null,
+    "sort_order": 56
+  },
+  {
+    "id": "charity_2",
+    "activity_id": "charity",
+    "text_en": "I give today, knowing Allah multiplies the reward many times over for whomever He wills.",
+    "text_ar": "أتصدّق اليوم، موقناً أن الله يضاعف الأجر أضعافاً لمن يشاء.",
+    "source_en": null,
+    "source_ar": null,
+    "sort_order": 57
+  },
+  {
+    "id": "charity_3",
+    "activity_id": "charity",
+    "text_en": "I give now, while healthy and attached to my wealth, fearing poverty, knowing this is the charity with the greatest reward.",
+    "text_ar": "أتصدّق الآن، وأنا صحيح شحيح أخشى الفقر، موقناً أن هذه هي الصدقة الأعظم أجراً.",
+    "source_en": null,
+    "source_ar": null,
+    "sort_order": 58
+  },
+  {
+    "id": "commute_1",
+    "activity_id": "commute",
+    "text_en": "I fill this journey with dhikr or a bit of Quran.",
+    "text_ar": "أجعل رحلتي عامرةً بذكر الله أو بتلاوة شيءٍ من القرآن.",
+    "source_en": null,
+    "source_ar": null,
+    "sort_order": 59
+  },
+  {
+    "id": "commute_2",
+    "activity_id": "commute",
+    "text_en": "I intend by this journey to seek lawful provision or beneficial knowledge, for the sake of Allah.",
+    "text_ar": "أنوي بهذه الرحلة طلبَ الرزق الحلال أو العلم النافع ابتغاءَ مرضاة الله.",
+    "source_en": null,
+    "source_ar": null,
+    "sort_order": 60
+  },
+  {
+    "id": "commute_3",
+    "activity_id": "commute",
+    "text_en": "I ask Allah to make this journey easy and bring me back safely.",
+    "text_ar": "أسأل الله أن ييسِّر لي رحلتي، وأن يردَّني سالماً غانماً.",
+    "source_en": null,
+    "source_ar": null,
+    "sort_order": 61
+  }
+]

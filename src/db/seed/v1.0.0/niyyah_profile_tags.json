@@ -1,0 +1,70 @@
+[
+  {
+    "niyyah_id": "work_professional_1",
+    "tag": "professional"
+  },
+  {
+    "niyyah_id": "work_professional_2",
+    "tag": "professional"
+  },
+  {
+    "niyyah_id": "work_professional_3",
+    "tag": "professional"
+  },
+  {
+    "niyyah_id": "work_professional_3",
+    "tag": "parent"
+  },
+  {
+    "niyyah_id": "cleaning_2",
+    "tag": "homemaker"
+  },
+  {
+    "niyyah_id": "cleaning_2",
+    "tag": "parent"
+  },
+  {
+    "niyyah_id": "cleaning_4",
+    "tag": "parent"
+  },
+  {
+    "niyyah_id": "cleaning_homemaker_1",
+    "tag": "homemaker"
+  },
+  {
+    "niyyah_id": "cleaning_parent_1",
+    "tag": "parent"
+  },
+  {
+    "niyyah_id": "reading_1",
+    "tag": "professional"
+  },
+  {
+    "niyyah_id": "reading_student_2",
+    "tag": "student"
+  },
+  {
+    "niyyah_id": "reading_student_2",
+    "tag": "professional"
+  },
+  {
+    "niyyah_id": "reading_student_3",
+    "tag": "student"
+  },
+  {
+    "niyyah_id": "family_2",
+    "tag": "parent"
+  },
+  {
+    "niyyah_id": "family_parent_1",
+    "tag": "parent"
+  },
+  {
+    "niyyah_id": "family_parent_2",
+    "tag": "parent"
+  },
+  {
+    "niyyah_id": "family_parent_3",
+    "tag": "parent"
+  }
+]

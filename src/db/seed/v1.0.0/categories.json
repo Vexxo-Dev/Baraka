@@ -1,0 +1,42 @@
+[
+  {
+    "id": "worship",
+    "label_en": "Worship",
+    "label_ar": "العبادة",
+    "is_custom": false,
+    "sort_order": 1,
+    "icon": null
+  },
+  {
+    "id": "daily",
+    "label_en": "Daily",
+    "label_ar": "يومية",
+    "is_custom": false,
+    "sort_order": 2,
+    "icon": null
+  },
+  {
+    "id": "productivity",
+    "label_en": "Productivity",
+    "label_ar": "إنتاجية",
+    "is_custom": false,
+    "sort_order": 3,
+    "icon": null
+  },
+  {
+    "id": "health",
+    "label_en": "Health",
+    "label_ar": "صحة",
+    "is_custom": false,
+    "sort_order": 4,
+    "icon": null
+  },
+  {
+    "id": "relationships",
+    "label_en": "Relationships",
+    "label_ar": "علاقات",
+    "is_custom": false,
+    "sort_order": 5,
+    "icon": null
+  }
+]
