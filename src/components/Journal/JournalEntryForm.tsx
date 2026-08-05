@@ -7,25 +7,15 @@ import { AppText } from "@components/UI/AppText";
 import { ChipSelector } from "@components/UI/ChipSelector";
 import { useTheme } from "@context/ThemeContext";
 import { LinearGradient } from "expo-linear-gradient";
-import { type JournalEntry } from "@types";
-import { useLocalize } from "@hooks/useLocalize";
+import type { DbJournalEntry } from "@hooks/db/useJournal";
+import type { DbUserActivity } from "@hooks/db/useActivities";
 import { spacing } from "@constants/spacing";
 import { radius } from "@constants/radius";
 
-interface ActivityOption {
-  id: string;
-  name: { en: string; ar: string };
-  enabled: boolean;
-}
-
 interface JournalEntryFormProps {
-  entry?: JournalEntry;
-  enabledActivities: ActivityOption[];
-  onSave: (data: {
-    activityId: string;
-    activityName: { en: string; ar: string };
-    note: string;
-  }) => void;
+  entry?: DbJournalEntry;
+  enabledActivities: DbUserActivity[];
+  onSave: (data: { activityId: string; note: string }) => void;
   onCancel: () => void;
 }
 
@@ -37,7 +27,6 @@ export function JournalEntryForm({
 }: JournalEntryFormProps) {
   const { t } = useTranslation();
   const { colors: C } = useTheme();
-  const localize = useLocalize();
 
   const [note, setNote] = useState("");
   const [selectedActivityId, setSelectedActivityId] = useState("");
@@ -60,23 +49,15 @@ export function JournalEntryForm({
       );
       return;
     }
-    const selectedActivityObj = enabledActivities.find(
-      (a) => a.id === selectedActivityId
-    );
-    const activityName = selectedActivityObj?.name ?? {
-      en: t("journal.general", { lng: "en" }),
-      ar: t("journal.general", { lng: "ar" }),
-    };
 
     onSave({
       activityId: selectedActivityId || "general",
-      activityName,
       note: note.trim(),
     });
   };
 
   const activityChips = enabledActivities.map((a) => ({
-    label: localize(a.name),
+    label: a.name,
     value: a.id,
   }));
 
@@ -111,6 +92,7 @@ export function JournalEntryForm({
         placeholder={t("journal.notePlaceholder")}
         multiline
         style={{ marginHorizontal: spacing.lg, marginTop: spacing.md }}
+        autoFocus
       />
       <View style={styles.formActions}>
         <AppButton

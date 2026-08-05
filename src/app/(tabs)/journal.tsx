@@ -12,9 +12,9 @@ import { Feather } from "@expo/vector-icons";
 
 import { BottomSheetModal } from "@gorhom/bottom-sheet";
 import { useFilteredJournal } from "@hooks/useFilteredJournal";
-import { useLocalize } from "@hooks/useLocalize";
-import { useJournalStore } from "@store";
-import { type JournalEntry } from "@types";
+import { useJournalActions } from "@hooks/db/useJournalActions";
+import { getActivityBilingualName } from "@hooks/db/useActivities";
+import type { DbJournalEntry } from "@hooks/db/useJournal";
 import { useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { Platform, StyleSheet, View } from "react-native";
@@ -25,7 +25,6 @@ import { spacing } from "@constants/spacing";
 import { radius } from "@constants/radius";
 
 export default function JournalScreen() {
-  const localize = useLocalize();
   const { t } = useTranslation();
   const { colors: C } = useTheme();
   const insets = useSafeAreaInsets();
@@ -43,43 +42,51 @@ export default function JournalScreen() {
     setSearch,
   } = useFilteredJournal();
 
-  const addJournalEntry = useJournalStore((s) => s.addJournalEntry);
-  const updateJournalEntry = useJournalStore((s) => s.updateJournalEntry);
-  const deleteJournalEntry = useJournalStore((s) => s.deleteJournalEntry);
+  const { addJournalEntry, updateJournalEntry, deleteJournalEntry } =
+    useJournalActions();
 
   const [showAdd, setShowAdd] = useState(false);
-  const [editingEntry, setEditingEntry] = useState<JournalEntry | undefined>(
+  const [editingEntry, setEditingEntry] = useState<DbJournalEntry | undefined>(
     undefined,
   );
-  const [selectedEntry, setSelectedEntry] = useState<JournalEntry | undefined>(
-    undefined,
-  );
+  const [selectedEntry, setSelectedEntry] = useState<
+    DbJournalEntry | undefined
+  >(undefined);
   const bottomSheetRef = useRef<BottomSheetModal>(null);
 
-  const handleSave = (data: {
-    activityId: string;
-    activityName: { en: string; ar: string };
-    note: string;
-  }) => {
+  const handleSave = async (data: { activityId: string; note: string }) => {
+    const { nameEn, nameAr } =
+      data.activityId === "general"
+        ? {
+            nameEn: t("journal.general", { lng: "en" }),
+            nameAr: t("journal.general", { lng: "ar" }),
+          }
+        : await getActivityBilingualName(
+            data.activityId,
+            enabledActivities.find((a) => a.id === data.activityId)
+              ?.isCustom ?? false,
+          );
+
     if (editingEntry) {
-      updateJournalEntry(editingEntry.id, {
+      await updateJournalEntry(editingEntry.id, {
         activityId: data.activityId,
-        activityName: data.activityName,
+        activityNameEn: nameEn,
+        activityNameAr: nameAr,
         note: data.note,
       });
       setEditingEntry(undefined);
     } else {
-      addJournalEntry({
+      await addJournalEntry({
         activityId: data.activityId,
-        activityName: data.activityName,
-        date: new Date().toISOString().split("T")[0],
+        activityNameEn: nameEn,
+        activityNameAr: nameAr,
         note: data.note,
       });
     }
     setShowAdd(false);
   };
 
-  const handleOptions = (entry: JournalEntry) => {
+  const handleOptions = (entry: DbJournalEntry) => {
     setSelectedEntry(entry);
     bottomSheetRef.current?.present();
   };
@@ -101,7 +108,7 @@ export default function JournalScreen() {
         );
         return {
           label: firstEntry
-            ? localize(firstEntry.activityName) || t("journal.general")
+            ? firstEntry.activityName || t("journal.general")
             : t("journal.general"),
           value: activityId,
         };

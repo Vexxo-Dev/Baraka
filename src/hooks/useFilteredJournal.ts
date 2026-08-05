@@ -1,20 +1,15 @@
 import { useMemo, useState, useEffect } from "react";
-import { useActivitiesStore, useJournalStore } from "@store";
+import { useEnabledActivities } from "@hooks/db/useActivities";
+import { useJournalEntries, type DbJournalEntry } from "@hooks/db/useJournal";
 import { useLanguage } from "@i18n";
-import { type JournalEntry } from "@types";
 
 export function useFilteredJournal() {
-  const journalEntries = useJournalStore((s) => s.journalEntries);
-  const activities = useActivitiesStore((s) => s.activities);
+  const journalEntries = useJournalEntries();
+  const enabledActivities = useEnabledActivities();
   const { language: lang } = useLanguage();
 
   const [filterActivity, setFilterActivity] = useState("__all__");
   const [search, setSearch] = useState("");
-
-  const enabledActivities = useMemo(
-    () => activities.filter((a) => a.enabled),
-    [activities]
-  );
 
   const filtered = useMemo(() => {
     return journalEntries.filter((e) => {
@@ -27,9 +22,9 @@ export function useFilteredJournal() {
   }, [journalEntries, filterActivity, search]);
 
   const groupedLocalized = useMemo(() => {
-    const groups: Record<string, JournalEntry[]> = {};
+    const groups: Record<string, DbJournalEntry[]> = {};
     filtered.forEach((entry) => {
-      const date = new Date(entry.createdAt).toLocaleDateString(
+      const date = entry.createdAt.toLocaleDateString(
         lang === "ar" ? "ar-SA" : "en-US",
         {
           weekday: "long",

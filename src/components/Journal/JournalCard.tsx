@@ -3,29 +3,27 @@ import { StyleSheet, View } from "react-native";
 import { useTranslation } from "react-i18next";
 import { AppText } from "@components/UI/AppText";
 import { AnimatedPressable } from "@components/UI/AnimatedPressable";
-import { NIYYAH_OPTIONS } from "@data/niyyahTemplates";
-import { useLocalize } from "@hooks/useLocalize";
-import { type JournalEntry } from "@types";
+import { useNiyyahTextById } from "@hooks/db/useNiyyahOptions";
+import type { DbJournalEntry } from "@hooks/db/useJournal";
 import { useTheme } from "@context/ThemeContext";
 import { spacing } from "@constants/spacing";
 import { radius } from "@constants/radius";
 
 interface JournalCardProps {
-  entry: JournalEntry;
-  onOptions?: (entry: JournalEntry) => void;
+  entry: DbJournalEntry;
+  onOptions?: (entry: DbJournalEntry) => void;
 }
 
 export default function JournalCard({ entry, onOptions }: JournalCardProps) {
   const { colors: C } = useTheme();
-  const localize = useLocalize();
   const { i18n } = useTranslation();
   const lang = i18n.language as "en" | "ar";
 
-  const formattedDate = new Date(entry.createdAt).toLocaleDateString(
+  const formattedDate = entry.createdAt.toLocaleDateString(
     lang === "ar" ? "ar-SA" : "en-US",
     { weekday: "short", month: "short", day: "numeric" },
   );
-  const formattedTime = new Date(entry.createdAt).toLocaleTimeString(
+  const formattedTime = entry.createdAt.toLocaleTimeString(
     lang === "ar" ? "ar-SA" : "en-US",
     {
       hour: "2-digit",
@@ -33,11 +31,9 @@ export default function JournalCard({ entry, onOptions }: JournalCardProps) {
     },
   );
 
-  const impactfulOption = entry.impactfulNiyyah
-    ? NIYYAH_OPTIONS.find((n) => n.id === entry.impactfulNiyyah)
-    : null;
+  const impactfulText = useNiyyahTextById(entry.impactfulNiyyahId);
 
-  const activityDisplayName = localize(entry.activityName);
+  const activityDisplayName = entry.activityName;
 
   return (
     <View
@@ -94,7 +90,7 @@ export default function JournalCard({ entry, onOptions }: JournalCardProps) {
       <AppText weight='Regular' variant='bodyLarge' style={[styles.noteText, { color: C.text }]}>
         {entry.note}
       </AppText>
-      {impactfulOption && (
+      {impactfulText && (
         <View
           style={[
             styles.impactRow,
@@ -107,7 +103,7 @@ export default function JournalCard({ entry, onOptions }: JournalCardProps) {
             variant='caption'
             style={[styles.impactText, { color: C.gold }]}
           >
-            {localize(impactfulOption.text)}
+            {impactfulText}
           </AppText>
         </View>
       )}
@@ -160,7 +156,7 @@ const styles = StyleSheet.create({
   noteText: { lineHeight: 24 },
   impactRow: {
     flexDirection: "row",
-    alignItems: "flex-start",
+    alignItems: "center",
     gap: spacing.sm,
     padding: spacing.sm,
     borderRadius: radius.sm,
