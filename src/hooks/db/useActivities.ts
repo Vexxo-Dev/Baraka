@@ -105,7 +105,7 @@ function useCustomActivitiesList(): DbUserActivity[] {
 
 export function useAllActivities(): DbUserActivity[] {
   const builtin = useBuiltinActivities();
-  const custom = useCustomActivitiechangsList();
+  const custom = useCustomActivitiesList();
   return [...builtin, ...custom];
 }
 
