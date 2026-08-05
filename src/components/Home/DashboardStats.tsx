@@ -29,7 +29,6 @@ export default function DashboardStats({
 
   return (
     <View style={styles.statsRow}>
-      {/* Today's Progress Box */}
       <View
         style={[
           styles.statCard,
@@ -102,7 +101,7 @@ export default function DashboardStats({
           <AppText
             weight='Regular'
             variant='caption'
-            style={{ color: isDark ? C.gold + "AA" : C.gold, lineHeight: 16 }}
+            style={[styles.ajrActs, { color: isDark ? C.gold + "AA" : C.gold }]}
           >
             +{ajr.acts} {t("dashboard.multiplierActs")}
           </AppText>
@@ -141,10 +140,15 @@ const styles = StyleSheet.create({
   statValue: {
     lineHeight: 24,
     marginBottom: 1,
+    fontVariant: ['tabular-nums']
   },
   statLabel: {
     textTransform: "uppercase",
     letterSpacing: 0.5,
     marginBottom: 2,
   },
+  ajrActs: {
+    lineHeight: 16,
+    fontVariant: ['tabular-nums']
+  }
 });

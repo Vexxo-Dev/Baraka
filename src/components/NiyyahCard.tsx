@@ -12,15 +12,14 @@ import Animated, {
   FadeOut,
 } from "react-native-reanimated";
 import { AnimatedPressable } from "./UI/AnimatedPressable";
-import type { UserActivity } from "@types";
-import { useLocalize } from "@hooks/useLocalize";
+import type { DbUserActivity } from "@hooks/db/useActivities";
 import { AppText } from "@components/UI/AppText";
 import { useTheme } from "@context/ThemeContext";
 import { spacing } from "@constants/spacing";
 import { radius } from "@constants/radius";
 
 type Props = {
-  activity: UserActivity;
+  activity: DbUserActivity;
   completed: boolean;
   onToggle: () => void;
   onPress: () => void;
@@ -37,7 +36,6 @@ export default function NiyyahCard({
   const isCompact = compact && completed;
   const { colors: C } = useTheme();
   const checkScale = useSharedValue(1);
-  const localize = useLocalize();
 
   const handleCheckPress = async () => {
     checkScale.value = withSequence(
@@ -48,11 +46,8 @@ export default function NiyyahCard({
     onToggle();
   };
 
-  const selectedCount = (activity.selectedNiyyahIds ?? []).filter(
-    (id) => !id.endsWith("_basic"),
-  ).length;
-  const displayName = localize(activity.name);
-  const displayNiyyah = activity.customNiyyah ?? localize(activity.niyyahText);
+  const displayName = activity.name;
+  const displayNiyyah = activity.customNiyyahText ?? activity.niyyahText;
 
   const animatedStyle = useAnimatedStyle(() => ({
     transform: [{ scale: checkScale.value }],
@@ -78,16 +73,18 @@ export default function NiyyahCard({
           style={[styles.content, isCompact && styles.contentCompact]}
         >
           <Animated.View
-            entering={FadeIn.duration(200)}
-            exiting={FadeOut.duration(150)}
-            style={[styles.sidePill, { backgroundColor: C.tint, top: isCompact ? 10 : 14 }]}
-          />
-
-          <Animated.View
             layout={LinearTransition.duration(280)}
             style={styles.textContainer}
           >
             <View style={styles.nameRow}>
+              <Animated.View
+                entering={FadeIn.duration(200)}
+                exiting={FadeOut.duration(150)}
+                style={[
+                  styles.sidePill,
+                  { backgroundColor: C.tint },
+                ]}
+              />
               <AppText
                 weight='Bold'
                 variant='bodyLarge'
@@ -96,27 +93,6 @@ export default function NiyyahCard({
               >
                 {displayName}
               </AppText>
-              {!isCompact && selectedCount > 0 && (
-                <Animated.View
-                  entering={FadeIn.duration(200)}
-                  exiting={FadeOut.duration(150)}
-                  style={[
-                    styles.countBadge,
-                    {
-                      backgroundColor: C.gold + "33",
-                      borderColor: C.gold + "66",
-                    },
-                  ]}
-                >
-                  <AppText
-                    weight='Bold'
-                    variant='caption'
-                    style={{ color: C.gold }}
-                  >
-                    ×{selectedCount + 1}
-                  </AppText>
-                </Animated.View>
-              )}
             </View>
             {!isCompact && (
               <Animated.View
@@ -126,7 +102,7 @@ export default function NiyyahCard({
                 <AppText
                   weight='Regular'
                   variant='footnote'
-                  style={{ color: C.textSecondary }}
+                  style={{ lineHeight: 24, color: C.textSecondary }}
                   numberOfLines={2}
                 >
                   {displayNiyyah}
@@ -186,13 +162,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: spacing.md,
   },
   textContainer: { flex: 1, gap: 3 },
-  nameRow: { flexDirection: "row", alignItems: "center", gap: spacing.xs },
-  countBadge: {
-    paddingHorizontal: spacing.xs,
-    paddingVertical: 2,
-    borderRadius: radius.sm,
-    borderWidth: 1,
-  },
+  nameRow: { flexDirection: "row", alignItems: "center", gap: spacing.sm, marginStart: -spacing.md },
   checkButton: {
     width: 24,
     height: 24,
@@ -213,10 +183,8 @@ const styles = StyleSheet.create({
     borderWidth: 2,
   },
   sidePill: {
-    position: "absolute",
-    left: 0,
     width: 3.5,
-    height: 24,
+    height: '100%',
     borderTopRightRadius: 2,
     borderBottomRightRadius: 2,
   },

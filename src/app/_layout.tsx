@@ -13,18 +13,20 @@ import { BottomSheetModalProvider } from "@gorhom/bottom-sheet";
 import { useNotifications } from "@/hooks/useNotifications";
 import { ErrorBoundary } from "@components/ErrorBoundary";
 import { useSettingsStore } from "@store/settingsStore";
-import { useLogsStore } from "@store/logsStore";
-import { getTodayString } from "@utils/date";
+import { getFreshDailyLogState } from "@hooks/db/useDailyLogs";
 import {
   recheckAndRescheduleIfNeeded,
   evaluateStreakRisk,
 } from "@/services/notifications";
 import { useLocalize } from "@hooks/useLocalize";
-import { useDayChange } from "@hooks/useDayChange";
 import { useTranslation } from "react-i18next";
 import { getAnonymousUserId } from "@/utils/device";
 import { Platform } from "react-native";
 import { KeyboardProvider } from "react-native-keyboard-controller";
+import { useMigrations } from "drizzle-orm/expo-sqlite/migrator";
+import { db } from "@/db/db";
+import { migrations } from "@/db/migrations";
+import { seedIfNeeded } from "@/db/seed";
 
 SplashScreen.preventAutoHideAsync();
 SplashScreen.setOptions({
@@ -82,11 +84,12 @@ function RootLayoutNav() {
 function App() {
   const [i18nReady, setI18nReady] = useState(false);
   const isLoading = useSettingsStore((s) => s.isLoading);
+  const { success: migrationsSuccess, error: migrationsError } = useMigrations(db, migrations);
+  const [seedDone, setSeedDone] = useState(false);
   const settings = useSettingsStore((s) => s.settings);
   const localize = useLocalize();
   const { t } = useTranslation();
   useNotifications();
-  useDayChange();
 
   useEffect(() => {
     if (i18n.isInitialized) {
@@ -100,7 +103,22 @@ function App() {
   }, []);
 
   useEffect(() => {
-    if (i18nReady && !isLoading) {
+    if (!migrationsSuccess) return;
+
+    let cancelled = false;
+    seedIfNeeded()
+      .catch((err) => Sentry.captureException(err))
+      .finally(() => {
+        if (!cancelled) setSeedDone(true);
+      });
+
+    return () => {
+      cancelled = true;
+    };
+  }, [migrationsSuccess]);
+
+  useEffect(() => {
+    if (i18nReady && !isLoading && migrationsSuccess && seedDone) {
       SplashScreen.hideAsync();
       recheckAndRescheduleIfNeeded(
         settings.reminderTime || "08:00",
@@ -108,24 +126,20 @@ function App() {
         settings.notificationsEnabled,
       );
 
-      const logsState = useLogsStore.getState();
-      logsState.recomputeStreak();
-      const freshStreak = useLogsStore.getState().streak;
-      const today = getTodayString();
-      const completedSomethingToday = useLogsStore
-        .getState()
-        .dailyLogs.some((l) => l.date === today);
-
-      evaluateStreakRisk({
-        notificationsEnabled: settings.notificationsEnabled,
-        streakCount: freshStreak,
-        completedSomethingToday,
-        t,
+      getFreshDailyLogState().then(({ streak, completedSomethingToday }) => {
+        evaluateStreakRisk({
+          notificationsEnabled: settings.notificationsEnabled,
+          streakCount: streak,
+          completedSomethingToday,
+          t,
+        });
       });
     }
   }, [
     i18nReady,
     isLoading,
+    migrationsSuccess,
+    seedDone,
     settings.reminderTime,
     settings.notificationsEnabled,
     localize,
@@ -133,7 +147,7 @@ function App() {
   ]);
 
   useEffect(() => {
-    if (i18nReady && !isLoading) {
+    if (i18nReady && !isLoading && migrationsSuccess && seedDone) {
       Sentry.setUser({
         id: getAnonymousUserId(),
       });
@@ -148,7 +162,13 @@ function App() {
         reminderTime: settings.reminderTime,
       });
     }
-  }, [i18nReady, isLoading]);
+  }, [i18nReady, isLoading, migrationsSuccess, seedDone]);
+
+  if (migrationsError) {
+    Sentry.captureException(migrationsError);
+  }
+
+
 
   return (
     <GestureHandlerRootView style={{ flex: 1 }}>

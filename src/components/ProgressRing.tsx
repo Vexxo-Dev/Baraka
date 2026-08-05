@@ -2,6 +2,7 @@ import { View } from "react-native";
 import Svg, { Circle } from "react-native-svg";
 import { AppText } from "@components/UI/AppText";
 import { useTheme } from "@context/ThemeContext";
+import { AppIcon as Feather } from "./UI/AppIcon";
 
 type Props = {
   percentage: number;
@@ -14,10 +15,9 @@ export default function ProgressRing({
   percentage,
   size = 72,
   color,
-  strokeWidth = 6,
+  strokeWidth = 8,
 }: Props) {
   const { colors: C } = useTheme();
-
   const ringColor = color || C.tint;
   const radius = (size - strokeWidth) / 2;
   const circumference = 2 * Math.PI * radius;
@@ -53,13 +53,17 @@ export default function ProgressRing({
           fill='none'
           strokeDasharray={`${circumference}`}
           strokeDashoffset={strokeDashoffset}
-          strokeLinecap={progress >= 100 ? "butt" : "round"}
+          strokeLinecap='round'
           transform={`rotate(-90 ${size / 2} ${size / 2})`}
         />
       </Svg>
-      <AppText weight='Bold' variant='body' style={{ color: ringColor }}>
-        {progress}%
-      </AppText>
+      {progress === 100 ? (
+        <Feather name='check' size={size / 2} color={ringColor} />
+      ) : (
+        <AppText weight='Bold' variant='body' style={{ color: ringColor }}>
+          {progress}%
+        </AppText>
+      )}
     </View>
   );
 }

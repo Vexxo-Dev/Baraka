@@ -1,5 +1,4 @@
 import { evaluateStreakRisk } from "@/services/notifications";
-import { getCategoryLabel } from "@components/Activities/CategorySection";
 import DashboardStats from "@components/Home/DashboardStats";
 import HadithCard from "@components/Home/HadithCard";
 import NiyyahCard from "@components/NiyyahCard";
@@ -12,12 +11,11 @@ import { radius } from "@constants/radius";
 import { spacing } from "@constants/spacing";
 import { useTheme } from "@context/ThemeContext";
 import { Feather } from "@expo/vector-icons";
-import { useActivityStats } from "@hooks/useActivityStats";
-import { useTodayLogs } from "@hooks/useTodayLogs";
+import { useEnabledActivities, type DbUserActivity } from "@hooks/db/useActivities";
+import { useDailyLogs, getFreshDailyLogState } from "@hooks/db/useDailyLogs";
+import { useDailyLogActions } from "@hooks/db/useDailyLogActions";
 import { useLanguage } from "@i18n";
-import { useActivitiesStore, useLogsStore, useSettingsStore } from "@store";
-import { type UserActivity } from "@types";
-import { getTodayString } from "@utils/date";
+import { useSettingsStore } from "@store";
 import { Haptic } from "@utils/haptics";
 import { parseReminderTime } from "@utils/parseReminderTime";
 import { router } from "expo-router";
@@ -30,6 +28,7 @@ import Animated, {
   LinearTransition,
 } from "react-native-reanimated";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
+import { getCategoryLabel } from "@/utils/categories";
 
 export default function TodayScreen() {
   const { t } = useTranslation();
@@ -37,30 +36,24 @@ export default function TodayScreen() {
   const insets = useSafeAreaInsets();
   const isWeb = Platform.OS === "web";
 
-  const activities = useActivitiesStore((s) => s.activities);
-  const updateActivity = useActivitiesStore((s) => s.updateActivity);
+  const rawEnabledActivities = useEnabledActivities();
 
-  const streak = useLogsStore((s) => s.streak);
-  const markComplete = useLogsStore((s) => s.markComplete);
-  const unmarkComplete = useLogsStore((s) => s.unmarkComplete);
+  const { streak, isCompletedToday, getTodayAjrMultiplier } = useDailyLogs();
+  const { markComplete, unmarkComplete } = useDailyLogActions();
   const notificationsEnabled = useSettingsStore(
     (s) => s.settings.notificationsEnabled,
   );
 
-  const { isCompletedToday } = useTodayLogs();
-  const { getTodayCompletionRate, getAjrMultiplier } = useActivityStats();
-
   const { language: lang } = useLanguage();
 
-  const getActivityMinutes = (activity: UserActivity): number | null => {
+  const getActivityMinutes = (activity: DbUserActivity): number | null => {
     const time = activity.customTime ?? activity.defaultTime;
     if (!time) return null;
     const { hour, minute } = parseReminderTime(time);
     return hour * 60 + minute;
   };
 
-  const enabledActivities = activities
-    .filter((a) => a.enabled)
+  const enabledActivities = rawEnabledActivities
     .slice()
     .sort((a, b) => {
       const aMin = getActivityMinutes(a);
@@ -71,8 +64,14 @@ export default function TodayScreen() {
       return aMin - bMin;
     });
 
-  const completionRate = getTodayCompletionRate();
-  const ajr = getAjrMultiplier();
+  const completedCount = enabledActivities.filter((a) =>
+    isCompletedToday(a.id),
+  ).length;
+  const completionRate =
+    enabledActivities.length === 0
+      ? 0
+      : Math.round((completedCount / enabledActivities.length) * 100);
+  const ajr = getTodayAjrMultiplier();
 
   const getDayGreeting = () => {
     const hour = new Date().getHours();
@@ -90,44 +89,31 @@ export default function TodayScreen() {
   };
 
   const handleToggle = useCallback(
-    async (activity: UserActivity) => {
+    async (activity: DbUserActivity) => {
       await Haptic.selection();
       if (isCompletedToday(activity.id)) {
-        unmarkComplete(activity.id);
-        updateActivity(activity.id, { selectedNiyyahIds: [] });
+        await unmarkComplete(activity.id);
       } else {
-        markComplete(activity.id, activity.selectedNiyyahIds ?? []);
+        await markComplete(activity.id, []);
       }
 
-      const today = getTodayString();
-      const completedSomethingToday = useLogsStore
-        .getState()
-        .dailyLogs.some((l) => l.date === today);
+      const { streak: freshStreak, completedSomethingToday } =
+        await getFreshDailyLogState();
       evaluateStreakRisk({
         notificationsEnabled,
-        streakCount: useLogsStore.getState().streak,
+        streakCount: freshStreak,
         completedSomethingToday,
         t,
       });
     },
-    [
-      isCompletedToday,
-      markComplete,
-      unmarkComplete,
-      updateActivity,
-      notificationsEnabled,
-      t,
-    ],
+    [isCompletedToday, markComplete, unmarkComplete, notificationsEnabled, t],
   );
 
-  const handleCardPress = useCallback((activity: UserActivity) => {
+  const handleCardPress = useCallback((activity: DbUserActivity) => {
     router.push({ pathname: "/activity/[id]", params: { id: activity.id } });
   }, []);
 
   const topPadding = isWeb ? 67 : insets.top;
-  const completedCount = enabledActivities.filter((a) =>
-    isCompletedToday(a.id),
-  ).length;
 
   const [categoryFilter, setCategoryFilter] = useState<string>("all");
   const availableCategories = [
