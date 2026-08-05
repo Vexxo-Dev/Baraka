@@ -10,13 +10,16 @@
     "build:android": "bunx expo run:android --variant release",
     "build:eas:android": "eas build --platform android --profile production",
     "typecheck": "tsc -p tsconfig.json --noEmit",
-    "clean": "bunx expo prebuild --clean"
+    "clean": "bunx expo prebuild --clean",
+    "db:generate": "drizzle-kit generate",
+    "db:studio": "drizzle-kit studio"
   },
   "dependencies": {
     "@expo/vector-icons": "^15.0.3",
     "@gorhom/bottom-sheet": "^5.2.14",
     "@react-native-community/datetimepicker": "8.4.4",
     "@sentry/react-native": "^8.15.1",
+    "drizzle-orm": "^0.45.2",
     "expo": "^54.0.0",
     "expo-constants": "~18.0.13",
     "expo-dev-client": "~6.0.20",
@@ -28,6 +31,7 @@
     "expo-notifications": "~0.32.17",
     "expo-router": "~6.0.23",
     "expo-splash-screen": "~31.0.13",
+    "expo-sqlite": "~16.0.10",
     "expo-symbols": "~1.0.8",
     "expo-system-ui": "~6.0.9",
     "expo-updates": "~29.0.18",
@@ -49,6 +53,8 @@
   },
   "devDependencies": {
     "@types/react": "~19.1.10",
+    "babel-plugin-inline-import": "^3.0.0",
+    "drizzle-kit": "^0.31.10",
     "typescript": "~5.9.2"
   }
 }
