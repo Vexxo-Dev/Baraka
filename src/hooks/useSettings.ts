@@ -15,12 +15,11 @@ import {
   evaluateStreakRisk,
 } from "@/services/notifications";
 import { getTodayString } from "@utils/date";
-import {
-  useActivitiesStore,
-  useJournalStore,
-  useLogsStore,
-  useSettingsStore,
-} from "@store";
+import { useSettingsStore } from "@store";
+import { useEnabledActivities } from "@hooks/db/useActivities";
+import { useDailyLogs } from "@hooks/db/useDailyLogs";
+import { useJournalEntries } from "@hooks/db/useJournal";
+import { clearUserData } from "@hooks/db/clearUserData";
 import { useToast } from "./useToast";
 import { type RoleKey } from "@utils/roleHelpers";
 
@@ -36,18 +35,17 @@ export function useSettings() {
   const { language: lang, changeLanguage } = useLanguage();
   const localize = useLocalize();
 
-  // Stores
+
   const settings = useSettingsStore((s) => s.settings);
   const updateSettings = useSettingsStore((s) => s.updateSettings);
-  const activities = useActivitiesStore((s) => s.activities);
-  const dailyLogs = useLogsStore((s) => s.dailyLogs);
-  const streak = useLogsStore((s) => s.streak);
-  const journalEntries = useJournalStore((s) => s.journalEntries);
+  const enabledActivities = useEnabledActivities();
+  const { logs: dailyLogs, streak } = useDailyLogs();
+  const journalEntries = useJournalEntries();
 
-  // Derived toast
+
   const { toastMessage, showToast, animatedToastStyle } = useToast();
 
-  // Derived notification state
+
   const notificationsActive = useMemo(
     () =>
       settings.notificationsEnabled &&
@@ -55,7 +53,7 @@ export function useSettings() {
     [settings.notificationsEnabled, settings.notificationsStatus],
   );
 
-  // Formatting reminder time
+
   const formattedReminderTime = useMemo(() => {
     const timeStr = settings.reminderTime || "08:00";
     const { hour, minute } = parseReminderTime(timeStr);
@@ -66,7 +64,7 @@ export function useSettings() {
     return `${displayHour}:${displayMinute} ${ampm}`;
   }, [settings.reminderTime, lang]);
 
-  // Handlers
+
   const handleProfileToggle = useCallback(
     (key: RoleKey) => {
       const newValue = !settings.profile[key];
@@ -164,14 +162,10 @@ export function useSettings() {
     const data = {
       exportedAt: new Date().toISOString(),
       profile: settings.profile,
-      activities: activities
-        .filter((a) => a.enabled)
-        .map((a) => ({
-          name: a.name,
-          enabled: a.enabled,
-          customNiyyah: a.customNiyyah,
-          selectedNiyyahIds: a.selectedNiyyahIds,
-        })),
+      activities: enabledActivities.map((a) => ({
+        name: a.name,
+        customNiyyahText: a.customNiyyahText,
+      })),
       dailyLogs: dailyLogs.slice(-30),
       journalEntries: journalEntries.slice(-50),
       streak,
@@ -185,9 +179,10 @@ export function useSettings() {
         t("settings.exportFallbackMessage"),
       );
     }
-  }, [settings.profile, activities, dailyLogs, journalEntries, streak, t]);
+  }, [settings.profile, enabledActivities, dailyLogs, journalEntries, streak, t]);
 
   const handleClearData = useCallback(async () => {
+    await clearUserData();
     await clearAppData(() => storage.clearAll());
   }, []);
 
