@@ -1,9 +1,9 @@
-import { DailyLog } from "@types";
-
 /**
- * Computes the current consecutive streak based on a list of logs.
+ * Computes the current consecutive streak based on a list of logs. Only
+ * reads `.date` (YYYY-MM-DD), so it works for both the MMKV `DailyLog[]`
+ * shape and SQLite `daily_logs` rows without a cast.
  */
-export function computeStreak(logs: DailyLog[]): number {
+export function computeStreak(logs: { date: string }[]): number {
   if (logs.length === 0) return 0;
 
   const uniqueDates = Array.from(new Set(logs.map((l) => l.date)))
