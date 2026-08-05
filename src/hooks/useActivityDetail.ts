@@ -2,75 +2,56 @@ import { useState, useMemo, useCallback } from "react";
 import { router } from "expo-router";
 import { useTranslation } from "react-i18next";
 import {
-  useActivitiesStore,
-  useLogsStore,
-  useJournalStore,
-  useSettingsStore,
-} from "@store";
-import { useTodayLogs } from "@hooks/useTodayLogs";
-import { useLocalize } from "@hooks/useLocalize";
-import { useToast } from "@hooks/useToast";
-import { getTodayString } from "@utils/date";
-import { Haptic } from "@utils/haptics";
-import { getNiyyahOptions } from "@data/niyyahTemplates";
+  useAllActivities,
+  getActivityBilingualName,
+} from "@hooks/db/useActivities";
+import { useActivityActions } from "@hooks/db/useActivityActions";
+import { useNiyyahOptions } from "@hooks/db/useNiyyahOptions";
+import { useDailyLogs, getFreshDailyLogState } from "@hooks/db/useDailyLogs";
+import { useDailyLogActions } from "@hooks/db/useDailyLogActions";
+import { useJournalActions } from "@hooks/db/useJournalActions";
+import { useSettingsStore } from "@store";
 import { useNiyyahSelection } from "./useNiyyahSelection";
-import { type NiyyahOption } from "@types";
+import { useToast } from "@hooks/useToast";
+import { Haptic } from "@utils/haptics";
 import { evaluateStreakRisk } from "@/services/notifications";
 
 type Step = "view" | "reflect";
 
+const EMPTY_IDS: string[] = [];
+
 export function useActivityDetail(id: string) {
-  const localize = useLocalize();
   const { t, i18n } = useTranslation();
   const { language: lang } = i18n;
   const { toastMessage, showToast, animatedToastStyle } = useToast();
 
-  const activities = useActivitiesStore((s) => s.activities);
-  const updateActivity = useActivitiesStore((s) => s.updateActivity);
-  const deleteCustomNiyyahOption = useActivitiesStore(
-    (s) => s.deleteCustomNiyyahOption,
-  );
   const settings = useSettingsStore((s) => s.settings);
   const getProfileTags = useSettingsStore((s) => s.getProfileTags);
-  const markComplete = useLogsStore((s) => s.markComplete);
-  const unmarkComplete = useLogsStore((s) => s.unmarkComplete);
-  const updateTodaySelection = useLogsStore((s) => s.updateTodaySelection);
-  const addJournalEntry = useJournalStore((s) => s.addJournalEntry);
-  const { isCompletedToday } = useTodayLogs();
 
-  const activity = activities.find((a) => a.id === id);
-  const profileTags = getProfileTags();
-  const showBilingual = settings.showBilingual;
+  const allActivities = useAllActivities();
+  const activity = allActivities.find((a) => a.id === id);
+
+  const { isCompletedToday, getTodayNiyyahIds } = useDailyLogs();
+  const { markComplete, unmarkComplete, setTodayNiyyahs } =
+    useDailyLogActions();
+  const {
+    updateActivityPrefs,
+    updateCustomActivityNiyyahText,
+    addCustomNiyyahOption,
+    deleteCustomNiyyahOption,
+  } = useActivityActions();
+  const { addJournalEntry } = useJournalActions();
+
   const completed = isCompletedToday(id);
-  const activityName = activity ? localize(activity.name) : "";
+  const activityName = activity?.name ?? "";
 
-  const profileTagsKey = profileTags.join(",");
-  const predefinedNiyyahs = useMemo(
-    () => (activity ? getNiyyahOptions(activity.id, profileTags) : []),
-    [activity?.id, profileTagsKey],
-  );
+  const profileTags = getProfileTags();
 
-  const advancedNiyyahs = useMemo(
-    () => predefinedNiyyahs.filter((n) => n.level === "advanced"),
-    [predefinedNiyyahs],
-  );
+  const allAdvanced = useNiyyahOptions(activity?.id, profileTags);
 
-  const allAdvanced = useMemo(() => {
-    if (!activity) return [];
-    const customOptions: NiyyahOption[] = (
-      activity.customNiyyahOptions || []
-    ).map((o) => ({
-      ...o,
-      activityId: activity.id,
-      level: "advanced" as const,
-    }));
-    return [...advancedNiyyahs, ...customOptions];
-  }, [activity, advancedNiyyahs]);
-
-  const activitySelectedIds = useMemo(() => {
-    const ids = activity?.selectedNiyyahIds ?? [];
-    return ids.filter((nId) => !nId.endsWith("_basic"));
-  }, [activity?.selectedNiyyahIds]);
+  const rawTodayIds = completed ? getTodayNiyyahIds(id) : EMPTY_IDS;
+  const todayIdsKey = rawTodayIds.join(",");
+  const activitySelectedIds = useMemo(() => rawTodayIds, [todayIdsKey]);
 
   const {
     localSelected,
@@ -90,37 +71,33 @@ export function useActivityDetail(id: string) {
       toggleNiyyah(niyyahId);
 
       if (completed && activity) {
-        const nextClean = nextSelected.filter((nId) => !nId.endsWith("_basic"));
-        updateActivity(activity.id, { selectedNiyyahIds: nextClean });
-        updateTodaySelection(activity.id, nextClean);
+        setTodayNiyyahs(activity.id, nextSelected);
       }
     },
-    [
-      localSelected,
-      toggleNiyyah,
-      completed,
-      activity,
-      updateActivity,
-      updateTodaySelection,
-    ],
+    [localSelected, toggleNiyyah, completed, activity, setTodayNiyyahs],
   );
 
   const [step, setStep] = useState<Step>("view");
   const [reflectionNote, setReflectionNote] = useState("");
   const [impactfulNiyyah, setImpactfulNiyyah] = useState("");
   const [showEditNiyyah, setShowEditNiyyah] = useState(false);
-  const [editedNiyyah, setEditedNiyyah] = useState(
-    activity?.customNiyyah ?? "",
-  );
+  const [editedNiyyah, setEditedNiyyah] = useState("");
 
-  const refreshStreakRisk = useCallback(() => {
-    const today = getTodayString();
-    const completedSomethingToday = useLogsStore
-      .getState()
-      .dailyLogs.some((l) => l.date === today);
+  const handleToggleEditNiyyah = useCallback(() => {
+    setShowEditNiyyah((prev) => {
+      const next = !prev;
+      if (next && activity) {
+        setEditedNiyyah(activity.customNiyyahText ?? activity.niyyahText);
+      }
+      return next;
+    });
+  }, [activity]);
+
+  const refreshStreakRisk = useCallback(async () => {
+    const { streak, completedSomethingToday } = await getFreshDailyLogState();
     evaluateStreakRisk({
       notificationsEnabled: settings.notificationsEnabled,
-      streakCount: useLogsStore.getState().streak,
+      streakCount: streak,
       completedSomethingToday,
       t,
     });
@@ -129,35 +106,31 @@ export function useActivityDetail(id: string) {
   const handleSaveAndRenew = useCallback(async () => {
     if (!activity) return;
     Haptic.success();
-    updateActivity(activity.id, { selectedNiyyahIds: cleanSelected });
-    markComplete(activity.id, cleanSelected);
-    refreshStreakRisk();
+    await markComplete(activity.id, cleanSelected);
+    await refreshStreakRisk();
     setStep("reflect");
-  }, [
-    activity,
-    cleanSelected,
-    updateActivity,
-    markComplete,
-    refreshStreakRisk,
-  ]);
+  }, [activity, cleanSelected, markComplete, refreshStreakRisk]);
 
   const handleUnmark = useCallback(async () => {
     if (!activity) return;
     Haptic.lightTap();
-    unmarkComplete(activity.id);
-    updateActivity(activity.id, { selectedNiyyahIds: [] });
-    refreshStreakRisk();
-  }, [activity, unmarkComplete, updateActivity, refreshStreakRisk]);
+    await unmarkComplete(activity.id);
+    await refreshStreakRisk();
+  }, [activity, unmarkComplete, refreshStreakRisk]);
 
   const handleSaveReflection = useCallback(async () => {
     if (!activity || !reflectionNote.trim()) return;
-    addJournalEntry({
+    const { nameEn, nameAr } = await getActivityBilingualName(
+      activity.id,
+      activity.isCustom,
+    );
+    await addJournalEntry({
       activityId: activity.id,
-      activityName: activity.name,
-      date: getTodayString(),
+      activityNameEn: nameEn,
+      activityNameAr: nameAr,
       note: reflectionNote.trim(),
       selectedNiyyahCount: ajrCount,
-      impactfulNiyyah: impactfulNiyyah || undefined,
+      impactfulNiyyahId: impactfulNiyyah || undefined,
     });
     Haptic.success();
     showToast(t("activity.reflectionSavedToast"));
@@ -174,43 +147,39 @@ export function useActivityDetail(id: string) {
 
   const handleSaveNiyyah = useCallback(async () => {
     if (!activity) return;
-    updateActivity(activity.id, { customNiyyah: editedNiyyah });
+    if (activity.isCustom) {
+      await updateCustomActivityNiyyahText(activity.id, editedNiyyah);
+    } else {
+      await updateActivityPrefs(activity.id, {
+        customNiyyahText: editedNiyyah,
+      });
+    }
     setShowEditNiyyah(false);
-  }, [activity, editedNiyyah, updateActivity]);
+  }, [
+    activity,
+    editedNiyyah,
+    updateCustomActivityNiyyahText,
+    updateActivityPrefs,
+  ]);
 
   const handleAddCustomNiyyah = useCallback(
     async (text: string) => {
       if (!activity || !text.trim()) return;
-      const newOption = {
-        id:
-          "custom_" +
-          Date.now().toString() +
-          Math.random().toString(36).substring(2, 5),
-        text: {
-          en: text.trim(),
-          ar: text.trim(),
-        },
-      };
-      const existing = activity.customNiyyahOptions || [];
-      updateActivity(activity.id, {
-        customNiyyahOptions: [...existing, newOption],
-      });
+      await addCustomNiyyahOption(activity.id, text.trim(), text.trim());
     },
-    [activity, updateActivity],
+    [activity, addCustomNiyyahOption],
   );
 
   const handleDeleteCustomNiyyah = useCallback(
     (optionId: string) => {
-      if (!activity) return;
-      deleteCustomNiyyahOption(activity.id, optionId);
+      deleteCustomNiyyahOption(optionId);
     },
-    [activity, deleteCustomNiyyahOption],
+    [deleteCustomNiyyahOption],
   );
 
   return {
     activity,
     activityName,
-    showBilingual,
     completed,
     allAdvanced,
     step,
@@ -225,6 +194,7 @@ export function useActivityDetail(id: string) {
     setImpactfulNiyyah,
     showEditNiyyah,
     setShowEditNiyyah,
+    handleToggleEditNiyyah,
     editedNiyyah,
     setEditedNiyyah,
     handleSaveAndRenew,
@@ -236,6 +206,5 @@ export function useActivityDetail(id: string) {
     toastMessage,
     animatedToastStyle,
     lang,
-    localize,
   };
 }

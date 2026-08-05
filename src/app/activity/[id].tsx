@@ -36,19 +36,18 @@ export default function ActivityDetailScreen() {
           onSaveReflection={state.handleSaveReflection}
           cleanSelectedCount={state.cleanSelectedCount}
           ajrCount={state.ajrCount}
-          localize={state.localize}
         />
       ) : (
         <ActivityViewStep
           activity={state.activity}
           activityName={state.activityName}
-          showBilingual={state.showBilingual}
           completed={state.completed}
           allAdvanced={state.allAdvanced}
           localSelected={state.localSelected}
           toggleNiyyah={state.toggleNiyyah}
           showEditNiyyah={state.showEditNiyyah}
           setShowEditNiyyah={state.setShowEditNiyyah}
+          onToggleEditNiyyah={state.handleToggleEditNiyyah}
           editedNiyyah={state.editedNiyyah}
           setEditedNiyyah={state.setEditedNiyyah}
           onSaveNiyyah={state.handleSaveNiyyah}
@@ -56,7 +55,6 @@ export default function ActivityDetailScreen() {
           onDeleteCustomNiyyah={state.handleDeleteCustomNiyyah}
           onSaveAndRenew={state.handleSaveAndRenew}
           onUnmark={state.handleUnmark}
-          localize={state.localize}
         />
       )}
     </View>

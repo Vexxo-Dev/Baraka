@@ -10,14 +10,14 @@ import { useTranslation } from "react-i18next";
 import { useTheme } from "@context/ThemeContext";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { router } from "expo-router";
-import { type NiyyahOption } from "@types";
+import type { DbNiyyahOption } from "@hooks/db/useNiyyahOptions";
 import { KeyboardAwareScrollViewCompat } from "@components/KeyboardAwareScrollViewCompat";
 import { spacing } from "@constants/spacing";
 import { radius } from "@constants/radius";
 
 interface ActivityReflectStepProps {
   activityName: string;
-  allAdvanced: NiyyahOption[];
+  allAdvanced: DbNiyyahOption[];
   localSelected: string[];
   reflectionNote: string;
   setReflectionNote: (note: string) => void;
@@ -26,7 +26,6 @@ interface ActivityReflectStepProps {
   onSaveReflection: () => void;
   cleanSelectedCount: number;
   ajrCount: number;
-  localize: (text: any) => string;
 }
 
 export const ActivityReflectStep = React.memo(
@@ -41,7 +40,6 @@ export const ActivityReflectStep = React.memo(
     onSaveReflection,
     cleanSelectedCount,
     ajrCount,
-    localize,
   }: ActivityReflectStepProps) => {
     const { t } = useTranslation();
     const { colors: C, isDark } = useTheme();
@@ -60,6 +58,7 @@ export const ActivityReflectStep = React.memo(
           { paddingTop: topPadding + spacing.sm, paddingBottom: isWeb ? 34 + 40 : 60 },
         ]}
         showsVerticalScrollIndicator={false}
+        keyboardShouldPersistTaps="handled"
       >
         <View style={styles.header}>
           <AnimatedPressable
@@ -126,7 +125,7 @@ export const ActivityReflectStep = React.memo(
                   style={styles.reflectNiyyahCheck}
                 />
                 <AppText weight="Regular" variant="body" style={[styles.reflectNiyyahText, { color: C.text }]}>
-                  {localize(n.text)}
+                  {n.text}
                 </AppText>
               </View>
             ))}
@@ -199,7 +198,7 @@ export const ActivityReflectStep = React.memo(
                       ]}
                     />
                     <AppText weight="Regular" variant="footnote" style={[styles.impactOptionText, { color: C.text }]}>
-                      {localize(n.text)}
+                      {n.text}
                     </AppText>
                   </AnimatedPressable>
                 ))}

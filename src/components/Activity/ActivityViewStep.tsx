@@ -2,9 +2,9 @@ import React from "react";
 import {
   View,
   StyleSheet,
-  ScrollView,
   Platform,
 } from "react-native";
+import { KeyboardAwareScrollViewCompat } from "@components/KeyboardAwareScrollViewCompat";
 import { AppText } from "@components/UI/AppText";
 import { AppTextInput } from "@components/UI/AppTextInput";
 import { AppButton } from "@components/UI/AppButton";
@@ -16,20 +16,21 @@ import { useTheme } from "@context/ThemeContext";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { router } from "expo-router";
 import { NiyyahChecklist } from "./NiyyahChecklist";
-import { type NiyyahOption, type UserActivity } from "@types";
+import type { DbUserActivity } from "@hooks/db/useActivities";
+import type { DbNiyyahOption } from "@hooks/db/useNiyyahOptions";
 import { spacing } from "@constants/spacing";
 import { radius } from "@constants/radius";
 
 interface ActivityViewStepProps {
-  activity: UserActivity;
+  activity: DbUserActivity;
   activityName: string;
-  showBilingual: boolean;
   completed: boolean;
-  allAdvanced: NiyyahOption[];
+  allAdvanced: DbNiyyahOption[];
   localSelected: string[];
   toggleNiyyah: (id: string) => void;
   showEditNiyyah: boolean;
   setShowEditNiyyah: (show: boolean) => void;
+  onToggleEditNiyyah: () => void;
   editedNiyyah: string;
   setEditedNiyyah: (text: string) => void;
   onSaveNiyyah: () => void;
@@ -37,20 +38,19 @@ interface ActivityViewStepProps {
   onDeleteCustomNiyyah: (optionId: string) => void;
   onSaveAndRenew: () => void;
   onUnmark: () => void;
-  localize: (text: any) => string;
 }
 
 export const ActivityViewStep = React.memo(
   ({
     activity,
     activityName,
-    showBilingual,
     completed,
     allAdvanced,
     localSelected,
     toggleNiyyah,
     showEditNiyyah,
     setShowEditNiyyah,
+    onToggleEditNiyyah,
     editedNiyyah,
     setEditedNiyyah,
     onSaveNiyyah,
@@ -58,7 +58,6 @@ export const ActivityViewStep = React.memo(
     onDeleteCustomNiyyah,
     onSaveAndRenew,
     onUnmark,
-    localize,
   }: ActivityViewStepProps) => {
     const { t } = useTranslation();
     const { colors: C, isDark } = useTheme();
@@ -67,12 +66,16 @@ export const ActivityViewStep = React.memo(
     const topPadding = isWeb ? 67 : insets.top;
 
     return (
-      <ScrollView
+      <KeyboardAwareScrollViewCompat
         contentContainerStyle={[
           styles.scrollContent,
-          { paddingTop: topPadding + spacing.sm, paddingBottom: isWeb ? 34 + 40 : 60 },
+          {
+            paddingTop: topPadding + spacing.sm,
+            paddingBottom: isWeb ? 34 + 40 : 60,
+          },
         ]}
         showsVerticalScrollIndicator={false}
+        keyboardShouldPersistTaps='handled'
       >
         <View style={styles.header}>
           <AnimatedPressable
@@ -92,7 +95,11 @@ export const ActivityViewStep = React.memo(
               ]}
             >
               <Feather name='check-circle' size={14} color={C.tint} />
-              <AppText weight='Medium' variant='footnote' style={{ color: C.tint }}>
+              <AppText
+                weight='Medium'
+                variant='footnote'
+                style={{ color: C.tint }}
+              >
                 {t("activity.completedToday")}
               </AppText>
             </View>
@@ -117,15 +124,6 @@ export const ActivityViewStep = React.memo(
           <AppText weight='Bold' variant='titleLarge' style={{ color: C.text }}>
             {activityName}
           </AppText>
-          {showBilingual && (
-            <AppText
-              weight='Regular'
-              variant='bodyLarge'
-              style={[styles.activityNameAr, { color: C.textSecondary }]}
-            >
-              {activity.name.ar}
-            </AppText>
-          )}
         </LinearGradient>
 
         <View
@@ -146,21 +144,20 @@ export const ActivityViewStep = React.memo(
                 {t("activity.coreIntention")}
               </AppText>
             </View>
-            {activity.id.startsWith("custom_") && (
-              <AnimatedPressable
-                onPress={() => setShowEditNiyyah(!showEditNiyyah)}
-              >
+            {activity.isCustom && (
+              <AnimatedPressable onPress={onToggleEditNiyyah} hitSlop={24}>
                 <Feather name='edit-2' size={16} color={C.tintLight} />
               </AnimatedPressable>
             )}
           </View>
 
-          {showEditNiyyah && activity.id.startsWith("custom_") ? (
+          {showEditNiyyah && activity.isCustom ? (
             <>
               <AppTextInput
                 value={editedNiyyah}
                 onChangeText={setEditedNiyyah}
                 multiline
+                autoFocus
               />
               <View style={styles.editActions}>
                 <AppButton
@@ -178,17 +175,13 @@ export const ActivityViewStep = React.memo(
             </>
           ) : (
             <>
-              <AppText weight='Regular' variant='bodyLarge' style={[styles.niyyahText, { color: C.text }]}>
-                {activity.customNiyyah ?? localize(activity.niyyahText)}
+              <AppText
+                weight='Regular'
+                variant='bodyLarge'
+                style={[styles.niyyahText, { color: C.text }]}
+              >
+                {activity.customNiyyahText ?? activity.niyyahText}
               </AppText>
-              {showBilingual && !activity.customNiyyah && (
-                <AppText
-                  variant='bodyLarge'
-                  style={[styles.arabicText, { color: C.textSecondary }]}
-                >
-                  {activity.niyyahText.ar}
-                </AppText>
-              )}
             </>
           )}
         </View>
@@ -199,8 +192,6 @@ export const ActivityViewStep = React.memo(
           onToggleNiyyah={toggleNiyyah}
           onAddCustomNiyyah={onAddCustomNiyyah}
           onDeleteCustomNiyyah={onDeleteCustomNiyyah}
-          showBilingual={showBilingual}
-          localize={localize}
         />
 
         <View
@@ -215,7 +206,10 @@ export const ActivityViewStep = React.memo(
             color={C.textMuted}
             style={styles.disclaimerIcon}
           />
-          <AppText variant='footnote' style={[styles.disclaimerText, { color: C.textSecondary }]}>
+          <AppText
+            variant='footnote'
+            style={[styles.disclaimerText, { color: C.textSecondary }]}
+          >
             {t("activity.niyyahDisclaimer")}
           </AppText>
         </View>
@@ -246,8 +240,12 @@ export const ActivityViewStep = React.memo(
             ]}
           >
             <Feather name='book-open' size={14} color={C.tint} />
-            <AppText weight='Medium' variant='caption' style={{ color: C.tint }}>
-              {localize(activity.hadithRef)}
+            <AppText
+              weight='Medium'
+              variant='caption'
+              style={{ color: C.tint }}
+            >
+              {activity.hadithRef}
             </AppText>
           </View>
         )}
@@ -265,7 +263,11 @@ export const ActivityViewStep = React.memo(
               ]}
             >
               <Feather name='check-circle' size={20} color={C.tint} />
-              <AppText weight='Bold' variant='subtitle' style={{ color: C.tint }}>
+              <AppText
+                weight='Bold'
+                variant='subtitle'
+                style={{ color: C.tint }}
+              >
                 {t("activity.renewedButton")}
               </AppText>
             </View>
@@ -286,7 +288,7 @@ export const ActivityViewStep = React.memo(
             onPress={onSaveAndRenew}
           />
         )}
-      </ScrollView>
+      </KeyboardAwareScrollViewCompat>
     );
   },
 );
@@ -322,9 +324,6 @@ const styles = StyleSheet.create({
     marginBottom: spacing.lg,
     gap: spacing.sm,
   },
-  activityNameAr: {
-    textAlign: "right",
-  },
   card: {
     borderRadius: radius.md,
     padding: spacing.lg,
@@ -347,11 +346,6 @@ const styles = StyleSheet.create({
     letterSpacing: 0.6,
   },
   niyyahText: { lineHeight: 24 },
-  arabicText: {
-    textAlign: "right",
-    marginTop: spacing.xs,
-    lineHeight: 26,
-  },
   editActions: {
     flexDirection: "row",
     gap: spacing.sm,

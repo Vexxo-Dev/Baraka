@@ -8,18 +8,16 @@ import { AppIcon as Feather } from "@components/UI/AppIcon";
 import { useTranslation } from "react-i18next";
 import { useTheme } from "@context/ThemeContext";
 import { getRoleByTag } from "@utils/roleHelpers";
-import { type NiyyahOption } from "@types";
+import type { DbNiyyahOption } from "@hooks/db/useNiyyahOptions";
 import { spacing } from "@constants/spacing";
 import { radius } from "@constants/radius";
 
 interface NiyyahChecklistProps {
-  allAdvanced: NiyyahOption[];
+  allAdvanced: DbNiyyahOption[];
   localSelected: string[];
   onToggleNiyyah: (id: string) => void;
   onAddCustomNiyyah: (text: string) => void;
   onDeleteCustomNiyyah: (optionId: string) => void;
-  showBilingual: boolean;
-  localize: (text: any) => string;
 }
 
 export const NiyyahChecklist = React.memo(
@@ -29,8 +27,6 @@ export const NiyyahChecklist = React.memo(
     onToggleNiyyah,
     onAddCustomNiyyah,
     onDeleteCustomNiyyah,
-    showBilingual,
-    localize,
   }: NiyyahChecklistProps) => {
     const { t } = useTranslation();
     const { colors: C } = useTheme();
@@ -43,8 +39,6 @@ export const NiyyahChecklist = React.memo(
       setCustomText("");
       setShowAddCustom(false);
     };
-
-    if (allAdvanced.length === 0) return null;
 
     return (
       <View
@@ -107,7 +101,7 @@ export const NiyyahChecklist = React.memo(
                   variant='body'
                   style={[styles.optionText, { color: checked ? C.text : C.textSecondary }]}
                 >
-                  {localize(option.text)}
+                  {option.text}
                 </AppText>
                 {option.profileTags && option.profileTags.length > 0 && (
                   <View style={styles.roleBadgeRow}>
@@ -140,17 +134,8 @@ export const NiyyahChecklist = React.memo(
                     })}
                   </View>
                 )}
-                {showBilingual && (
-                  <AppText
-                    weight='Regular'
-                    variant='footnote'
-                    style={[styles.optionTextAr, { color: C.textMuted }]}
-                  >
-                    {option.text.ar}
-                  </AppText>
-                )}
               </View>
-              {option.id.startsWith("custom_") && (
+              {option.isCustom && (
                 <AnimatedPressable
                   onPress={() => onDeleteCustomNiyyah(option.id)}
                   hitSlop={12}
@@ -188,6 +173,7 @@ export const NiyyahChecklist = React.memo(
               onChangeText={setCustomText}
               placeholder={t("activity.customNiyyahPlaceholder")}
               multiline
+              autoFocus
             />
             <View style={styles.editActions}>
               <AppButton
@@ -261,11 +247,6 @@ const styles = StyleSheet.create({
     paddingVertical: spacing.xs,
     borderRadius: radius.sm,
     alignSelf: "flex-start",
-  },
-  optionTextAr: {
-    textAlign: "right",
-    marginTop: spacing.xs,
-    lineHeight: 20,
   },
   deleteButton: {
     padding: spacing.xs,
