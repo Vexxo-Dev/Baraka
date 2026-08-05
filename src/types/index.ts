@@ -68,7 +68,6 @@ export type AppThemeMode = "auto" | "light" | "dark";
 export type NotificationPermissionStatus = "undetermined" | "granted" | "denied";
 
 export type AppSettings = {
-  showBilingual: boolean;
   darkMode: AppThemeMode;
   notificationsStatus: NotificationPermissionStatus;
   notificationsEnabled: boolean;

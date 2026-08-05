@@ -5,7 +5,6 @@ import { storageAdapter } from "@lib/storage";
 import type { AppSettings } from "@types";
 
 const DEFAULT_SETTINGS: AppSettings = {
-  showBilingual: false,
   darkMode: "auto",
   notificationsStatus: "undetermined",
   notificationsEnabled: true,
