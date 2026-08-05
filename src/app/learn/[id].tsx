@@ -1,7 +1,6 @@
 import { useLocalSearchParams, router } from "expo-router";
-import { EDUCATION_ENTRIES } from "@data/learnContent";
+import { useLearnContent } from "@hooks/db/useLearnContent";
 import EducationDetail from "@components/Learn/EducationDetail";
-import { useSettingsStore } from "@store";
 import { useTranslation } from "react-i18next";
 import { View } from "react-native";
 import { AppText } from "@components/UI/AppText";
@@ -9,9 +8,9 @@ import { AppText } from "@components/UI/AppText";
 export default function LearnDetailScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
   const { t } = useTranslation();
-  const settings = useSettingsStore((s) => s.settings);
+  const entries = useLearnContent();
 
-  const entry = EDUCATION_ENTRIES.find((e) => e.id === id);
+  const entry = entries.find((e) => e.id === id);
 
   if (!entry) {
     return (
@@ -21,12 +20,5 @@ export default function LearnDetailScreen() {
     );
   }
 
-  return (
-    <EducationDetail
-      entry={entry}
-      showBilingual={settings.showBilingual}
-      mapCategoryLabel={(category) => t("category." + category)}
-      onClose={() => router.back()}
-    />
-  );
+  return <EducationDetail entry={entry} onClose={() => router.back()} />;
 }

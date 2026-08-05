@@ -11,30 +11,24 @@ import { AnimatedPressable } from "@components/UI/AnimatedPressable";
 import { AppIcon } from "@components/UI/AppIcon";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { AppText } from "@components/UI/AppText";
-import { type EducationEntry } from "@types";
-import { useLocalize } from "@hooks/useLocalize";
+import { type DbLearnEntry } from "@hooks/db/useLearnContent";
 import { useTheme } from "@context/ThemeContext";
 import { spacing } from "@constants/spacing";
 import { radius } from "@constants/radius";
 
 interface EducationDetailProps {
-  entry: EducationEntry;
-  showBilingual: boolean;
-  mapCategoryLabel: (category: string) => string;
+  entry: DbLearnEntry;
   onClose: () => void;
 }
 
 export default function EducationDetail({
   entry,
-  showBilingual,
-  mapCategoryLabel,
   onClose,
 }: EducationDetailProps) {
   const { t } = useTranslation();
   const { colors: C, isDark } = useTheme();
   const insets = useSafeAreaInsets();
   const isWeb = Platform.OS === "web";
-  const localize = useLocalize();
 
   return (
     <View style={[styles.detailContainer, { backgroundColor: C.background }]}>
@@ -89,21 +83,12 @@ export default function EducationDetail({
             ]}
           >
             <AppText weight='Medium' variant='caption' style={{ color: C.textSecondary }}>
-              {mapCategoryLabel(entry.category)}
+              {t("category." + entry.category)}
             </AppText>
           </View>
           <AppText weight='Bold' variant='titleLarge' style={[styles.detailTitle, { color: C.text }]}>
-            {localize(entry.title)}
+            {entry.title}
           </AppText>
-          {showBilingual && (
-            <AppText
-              weight='Regular'
-              variant='bodyLarge'
-              style={[styles.detailTitleAr, { color: C.textSecondary }]}
-            >
-              {entry.title.ar}
-            </AppText>
-          )}
         </LinearGradient>
 
         <View
@@ -113,29 +98,9 @@ export default function EducationDetail({
           ]}
         >
           <AppText weight='Regular' variant='bodyLarge' style={[styles.detailText, { color: C.text }]}>
-            {localize(entry.content)}
+            {entry.content}
           </AppText>
         </View>
-
-        {showBilingual && (
-          <View
-            style={[
-              styles.arabicBody,
-              { backgroundColor: C.backgroundCard, borderColor: C.border },
-            ]}
-          >
-            <AppText weight='Medium' variant='caption' style={{ color: C.textSecondary }}>
-              {t("learn.arabicSection")}
-            </AppText>
-            <AppText
-              weight='Regular'
-              variant='bodyLarge'
-              style={[styles.arabicBodyText, { color: C.text }]}
-            >
-              {entry.content.ar}
-            </AppText>
-          </View>
-        )}
 
         <View
           style={[
@@ -149,7 +114,7 @@ export default function EducationDetail({
               {t("common.source")}
             </AppText>
             <AppText weight='Regular' variant='body' style={{ color: C.tint }}>
-              {localize(entry.source)}
+              {entry.source}
             </AppText>
           </View>
         </View>
@@ -183,9 +148,6 @@ const styles = StyleSheet.create({
     borderRadius: radius.md,
   },
   detailTitle: { lineHeight: 32 },
-  detailTitleAr: {
-    textAlign: "right",
-  },
   detailBody: {
     borderRadius: radius.md,
     padding: spacing.lg,
@@ -193,17 +155,6 @@ const styles = StyleSheet.create({
     marginBottom: spacing.md,
   },
   detailText: { lineHeight: 26 },
-  arabicBody: {
-    borderRadius: radius.md,
-    padding: spacing.lg,
-    borderWidth: 1,
-    marginBottom: spacing.md,
-    gap: spacing.sm,
-  },
-  arabicBodyText: {
-    textAlign: "right",
-    lineHeight: 28,
-  },
   sourceCard: {
     flexDirection: "row",
     alignItems: "flex-start",

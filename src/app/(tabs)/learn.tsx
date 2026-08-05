@@ -1,4 +1,4 @@
-import { EDUCATION_ENTRIES, LEARN_CATEGORIES } from "@data/learnContent";
+import { useLearnContent, useLearnCategories } from "@hooks/db/useLearnContent";
 
 import EducationCard from "@components/Learn/EducationCard";
 import { AnimatedPressable } from "@components/UI/AnimatedPressable";
@@ -25,21 +25,22 @@ export default function LearnScreen() {
   const [search, setSearch] = useState("");
   const [activeCategory, setActiveCategory] = useState("All");
 
+  const entries = useLearnContent();
+  const categories = useLearnCategories();
+
   const filtered = useMemo(() => {
-    return EDUCATION_ENTRIES.filter((e) => {
+    return entries.filter((e) => {
       const q = search.toLowerCase();
       const matchSearch =
         !q ||
-        e.title.en.toLowerCase().includes(q) ||
-        e.title.ar.toLowerCase().includes(q) ||
+        e.title.toLowerCase().includes(q) ||
         e.keywords.some((k) => k.toLowerCase().includes(q)) ||
-        e.content.en.toLowerCase().includes(q) ||
-        e.content.ar.toLowerCase().includes(q);
+        e.content.toLowerCase().includes(q);
       const matchCategory =
         activeCategory === "All" || e.category === activeCategory;
       return matchSearch && matchCategory;
     });
-  }, [search, activeCategory]);
+  }, [entries, search, activeCategory]);
 
   const topPadding = isWeb ? 67 : insets.top;
 
@@ -83,7 +84,7 @@ export default function LearnScreen() {
         </View>
 
         <ChipSelector
-          items={LEARN_CATEGORIES.map(cat => ({ label: t("category." + cat), value: cat }))}
+          items={categories.map(cat => ({ label: t("category." + cat), value: cat }))}
           selectedValue={activeCategory}
           onSelect={setActiveCategory}
           style={styles.filterScroll}

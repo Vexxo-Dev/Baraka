@@ -3,8 +3,7 @@ import { AppText } from "@components/UI/AppText";
 import { AnimatedPressable } from "@components/UI/AnimatedPressable";
 import { useTheme } from "@context/ThemeContext";
 import { AppIcon as Feather } from "@components/UI/AppIcon";
-import { useLocalize } from "@hooks/useLocalize";
-import { type EducationEntry } from "@types";
+import { type DbLearnEntry } from "@hooks/db/useLearnContent";
 import { StyleSheet, View } from "react-native";
 
 import { categoryColors as themeCategoryColors } from "@constants/colors";
@@ -14,7 +13,7 @@ import { radius } from "@constants/radius";
 import { useTranslation } from "react-i18next";
 
 interface EducationCardProps {
-  entry: EducationEntry;
+  entry: DbLearnEntry;
   onPress: () => void;
 }
 
@@ -32,7 +31,6 @@ export default memo(function EducationCard({
   onPress,
 }: EducationCardProps) {
   const { colors: C } = useTheme();
-  const localize = useLocalize();
   const { t } = useTranslation();
 
   const catColor = categoryColorMap[entry.category] || C.tint;
@@ -59,7 +57,7 @@ export default memo(function EducationCard({
         style={[styles.eduTitle, { color: C.text }]}
         numberOfLines={2}
       >
-        {localize(entry.title)}
+        {entry.title}
       </AppText>
       <AppText
         weight='Regular'
@@ -67,13 +65,13 @@ export default memo(function EducationCard({
         style={[styles.eduPreview, { color: C.textSecondary }]}
         numberOfLines={3}
       >
-        {localize(entry.content)}
+        {entry.content}
       </AppText>
       <View style={styles.eduFooter}>
         <View style={styles.sourceRow}>
           <Feather name='book-open' size={11} color={C.tint} />
           <AppText weight='Regular' variant='caption' style={{ color: C.tint }}>
-            {localize(entry.source)}
+            {entry.source}
           </AppText>
         </View>
         <Feather name="chevron-right" size={16} color={C.textMuted} flipRTL />
