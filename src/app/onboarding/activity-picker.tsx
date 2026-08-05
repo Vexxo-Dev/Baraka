@@ -9,12 +9,11 @@ import { useTheme } from "@context/ThemeContext";
 import { AppText } from "@components/UI/AppText";
 import { ActivityPickerCard } from "@components/onboarding/ActivityPickerCard";
 import { useOnboarding } from "@hooks/useOnboarding";
-import { useActivitiesStore } from "@store/activitiesStore";
-import { DEFAULT_ACTIVITIES } from "@data/activities";
+import { useAllActivities, type DbUserActivity } from "@hooks/db/useActivities";
+import { useActivityActions } from "@hooks/db/useActivityActions";
 import { DEFAULT_ACTIVITY_IDS } from "@data/onboardingDefaults";
 import { OnboardingDots } from "@components/onboarding/OnboardingDots";
 import { ONBOARDING_SLIDES } from "@data/onboardingSlides";
-import type { Activity } from "@types";
 import { spacing } from "@constants/spacing";
 
 const PRAYER_IDS = DEFAULT_ACTIVITY_IDS;
@@ -25,15 +24,18 @@ export default function ActivityPickerScreen() {
   const { t } = useTranslation();
   const insets = useSafeAreaInsets();
   const { complete } = useOnboarding();
+  const { setEnabledActivities } = useActivityActions();
+
+  const allActivities = useAllActivities();
 
   const { prayerActivities, otherActivities } = useMemo(() => {
-    const prayers: Activity[] = [];
-    const others: Activity[] = [];
-    DEFAULT_ACTIVITIES.forEach((a) => {
+    const prayers: DbUserActivity[] = [];
+    const others: DbUserActivity[] = [];
+    allActivities.forEach((a) => {
       (PRAYER_IDS.includes(a.id) ? prayers : others).push(a);
     });
     return { prayerActivities: prayers, otherActivities: others };
-  }, []);
+  }, [allActivities]);
 
   const [selectedPrayerIds, setSelectedPrayerIds] =
     useState<string[]>(PRAYER_IDS);
@@ -54,17 +56,12 @@ export default function ActivityPickerScreen() {
   }, []);
 
   const applyAndFinish = useCallback(
-    (ids: string[]) => {
-      useActivitiesStore.setState((state) => ({
-        activities: state.activities.map((a) => ({
-          ...a,
-          enabled: ids.includes(a.id),
-        })),
-      }));
+    async (ids: string[]) => {
+      await setEnabledActivities(ids);
       complete();
       router.replace("/(tabs)");
     },
-    [complete],
+    [complete, setEnabledActivities],
   );
 
   const handleDone = useCallback(() => {
@@ -74,7 +71,7 @@ export default function ActivityPickerScreen() {
   const otherAtMax = selectedOtherIds.length >= MAX_OTHER_SELECTION;
 
   const renderOtherCard = useCallback(
-    ({ item }: { item: Activity }) => {
+    ({ item }: { item: DbUserActivity }) => {
       const isSelected = selectedOtherIds.includes(item.id);
       return (
         <ActivityPickerCard

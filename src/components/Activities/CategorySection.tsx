@@ -1,10 +1,10 @@
 import { memo, useCallback, useState, useEffect } from "react";
 import { View, StyleSheet, Switch } from "react-native";
+import { getCategoryIcon, getCategoryLabel } from "@utils/categories";
 import { AppIcon } from "@components/UI/AppIcon";
 import { useTranslation } from "react-i18next";
 import { AppText } from "@components/UI/AppText";
-import { useLocalize } from "@hooks/useLocalize";
-import { type UserActivity } from "@types";
+import type { DbUserActivity } from "@hooks/db/useActivities";
 import { useTheme } from "@context/ThemeContext";
 import { spacing } from "@constants/spacing";
 import { radius } from "@constants/radius";
@@ -19,42 +19,15 @@ import Animated, {
   withTiming,
 } from "react-native-reanimated";
 
-const CATEGORY_ICONS: Record<string, any> = {
-  worship: "star",
-  daily: "sun",
-  productivity: "briefcase",
-  health: "activity",
-  relationships: "heart",
-  learning: "book-open",
-};
-
-// Exported so other screens (e.g. Home's category filter chips) can reuse
-// the exact same category taxonomy/labels rather than re-deriving their own.
-export function getCategoryIcon(cat: string) {
-  return CATEGORY_ICONS[cat] || "circle";
-}
-
-export function getCategoryLabel(cat: string, t: any) {
-  const labels: Record<string, string> = {
-    worship: t("manageActivities.category.worship"),
-    daily: t("manageActivities.category.daily"),
-    productivity: t("manageActivities.category.productivity"),
-    health: t("manageActivities.category.health"),
-    relationships: t("manageActivities.category.relationships"),
-    learning: t("manageActivities.category.learning"),
-  };
-  return labels[cat] || cat;
-}
 
 interface ActivityRowProps {
-  activity: UserActivity;
-  onToggle: (activity: UserActivity) => void;
-  localize: any;
+  activity: DbUserActivity;
+  onToggle: (activity: DbUserActivity) => void;
   colors: any;
 }
 
 const ActivityRow = memo(
-  ({ activity, onToggle, localize, colors: C }: ActivityRowProps) => {
+  ({ activity, onToggle, colors: C }: ActivityRowProps) => {
     const handleToggle = useCallback(() => {
       onToggle(activity);
     }, [activity, onToggle]);
@@ -67,7 +40,7 @@ const ActivityRow = memo(
             variant='bodyLarge'
             style={{ color: C.text }}
           >
-            {localize(activity.name)}
+            {activity.name}
           </AppText>
         </View>
         <Switch
@@ -84,8 +57,8 @@ const ActivityRow = memo(
 
 interface CategorySectionProps {
   category: string;
-  categoryActivities: UserActivity[];
-  onToggleActivity: (activity: UserActivity) => void;
+  categoryActivities: DbUserActivity[];
+  onToggleActivity: (activity: DbUserActivity) => void;
   isRecentlyToggled?: boolean;
 }
 
@@ -97,7 +70,6 @@ export default memo(function CategorySection({
 }: CategorySectionProps) {
   const { t } = useTranslation();
   const { colors: C } = useTheme();
-  const localize = useLocalize();
 
   const [isExpanded, setIsExpanded] = useState(false);
 
@@ -165,7 +137,6 @@ export default memo(function CategorySection({
               <ActivityRow
                 activity={activity}
                 onToggle={onToggleActivity}
-                localize={localize}
                 colors={C}
               />
               {index < categoryActivities.length - 1 && (

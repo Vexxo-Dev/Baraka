@@ -9,12 +9,10 @@ import { AppTextInput } from "@components/UI/AppTextInput";
 import { useTranslation } from "react-i18next";
 import { Haptic } from "@utils/haptics";
 import { AppText } from "@components/UI/AppText";
-import { useActivitiesStore } from "@store";
+import { useActivityActions } from "@hooks/db/useActivityActions";
 import { useTheme } from "@context/ThemeContext";
 import { spacing } from "@constants/spacing";
 import { radius } from "@constants/radius";
-
-import { generateCustomId } from "@utils/id";
 
 interface AddActivityFormProps {
   onClose: () => void;
@@ -22,7 +20,7 @@ interface AddActivityFormProps {
 
 export default function AddActivityForm({ onClose }: AddActivityFormProps) {
   const { t } = useTranslation();
-  const addCustomActivity = useActivitiesStore((s) => s.addCustomActivity);
+  const { addCustomActivity } = useActivityActions();
   const { colors: C } = useTheme();
 
   const [newName, setNewName] = useState("");
@@ -39,17 +37,15 @@ export default function AddActivityForm({ onClose }: AddActivityFormProps) {
     const defaultNiyyah = t("manageActivities.defaultIntention", {
       activity: newName.trim(),
     });
-    const newActivity = {
-      id: generateCustomId(),
-      name: { en: newName.trim(), ar: newName.trim() },
-      category: "daily",
-      niyyahText: {
-        en: newNiyyah.trim() || defaultNiyyah,
-        ar: newNiyyah.trim() || defaultNiyyah,
-      },
-    };
+    const niyyahText = newNiyyah.trim() || defaultNiyyah;
 
-    addCustomActivity(newActivity);
+    await addCustomActivity({
+      nameEn: newName.trim(),
+      nameAr: newName.trim(),
+      category: "daily",
+      niyyahTextEn: niyyahText,
+      niyyahTextAr: niyyahText,
+    });
 
     Haptic.success();
     setNewName("");

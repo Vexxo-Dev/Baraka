@@ -1,15 +1,14 @@
 import { View, StyleSheet } from "react-native";
 import { Feather } from "@expo/vector-icons";
 import { useTheme } from "@context/ThemeContext";
-import { useLocalize } from "@hooks/useLocalize";
 import { AppText } from "@components/UI/AppText";
 import { AnimatedPressable } from "@components/UI/AnimatedPressable";
-import type { Activity } from "@types";
+import type { DbUserActivity } from "@hooks/db/useActivities";
 import { spacing } from "@constants/spacing";
 import { radius } from "@constants/radius";
 
 interface ActivityPickerCardProps {
-  activity: Activity;
+  activity: DbUserActivity;
   selected: boolean;
   onPress: () => void;
   disabled?: boolean;
@@ -22,7 +21,6 @@ export function ActivityPickerCard({
   disabled = false,
 }: ActivityPickerCardProps) {
   const { colors: C } = useTheme();
-  const localize = useLocalize();
 
   return (
     <AnimatedPressable
@@ -49,7 +47,7 @@ export function ActivityPickerCard({
         numberOfLines={2}
         style={[styles.name, { color: C.text }]}
       >
-        {localize(activity.name)}
+        {activity.name}
       </AppText>
     </AnimatedPressable>
   );
@@ -63,6 +61,7 @@ const styles = StyleSheet.create({
     padding: spacing.lg,
     margin: spacing.xs + 2,
     alignItems: "center",
+    justifyContent: "center",
     gap: spacing.md,
   },
   checkBadge: {

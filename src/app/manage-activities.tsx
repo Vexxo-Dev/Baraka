@@ -3,8 +3,8 @@ import { AppText } from "@components/UI/AppText";
 import { useTheme } from "@context/ThemeContext";
 import { Feather } from "@expo/vector-icons";
 import { AppIcon } from "@components/UI/AppIcon";
-import { useActivitiesStore } from "@store";
-import { type UserActivity } from "@types";
+import { useAllActivities, type DbUserActivity } from "@hooks/db/useActivities";
+import { useActivityActions } from "@hooks/db/useActivityActions";
 import { Haptic } from "@utils/haptics";
 import { useState, useMemo, useCallback } from "react";
 import { useTranslation } from "react-i18next";
@@ -24,8 +24,8 @@ export default function ManageActivitiesScreen() {
   const insets = useSafeAreaInsets();
   const isWeb = Platform.OS === "web";
 
-  const activities = useActivitiesStore((s) => s.activities);
-  const toggleActivity = useActivitiesStore((s) => s.toggleActivity);
+  const activities = useAllActivities();
+  const { toggleActivity } = useActivityActions();
   const [showAddForm, setShowAddForm] = useState(false);
   const [lastToggledCategory, setLastToggledCategory] = useState<string | null>(null);
 
@@ -38,9 +38,9 @@ export default function ManageActivitiesScreen() {
   }, [activities]);
 
   const handleToggle = useCallback(
-    (activity: UserActivity) => {
+    (activity: DbUserActivity) => {
       Haptic.selection();
-      toggleActivity(activity.id);
+      toggleActivity(activity.id, activity.isCustom);
       setLastToggledCategory(activity.category);
     },
     [toggleActivity],
