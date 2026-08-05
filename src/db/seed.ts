@@ -14,6 +14,9 @@ import {
   userActivityPrefs,
   customActivities,
   customNiyyahOptions,
+  journalEntries,
+  dailyLogs,
+  dailyLogNiyyahs,
 } from "./schema";
 import {
   categoriesSeed,
@@ -36,6 +39,8 @@ export const CONTENT_VERSION = "1.0.0";
 const VERSION_KEY = "version";
 const MMKV_CLEARED_KEY = "mmkv_content_cleared";
 const ACTIVITIES_MIGRATED_KEY = "activities_migrated_from_mmkv";
+const JOURNAL_MIGRATED_KEY = "journal_migrated_from_mmkv";
+const DAILY_LOGS_MIGRATED_KEY = "daily_logs_migrated_from_mmkv";
 
 type LegacyUserActivity = {
   id: string;
@@ -46,6 +51,26 @@ type LegacyUserActivity = {
   customTime?: string;
   customNiyyah?: string;
   customNiyyahOptions?: Array<{ id: string; text: { en: string; ar: string } }>;
+};
+
+// Shape matches the old (pre-SQLite) `JournalEntry` type in src/types/index.ts.
+type LegacyJournalEntry = {
+  id: string;
+  activityId: string;
+  activityName?: { en: string; ar: string };
+  createdAt?: string;
+  note?: string;
+  selectedNiyyahCount?: number;
+  impactfulNiyyah?: string;
+};
+
+// Shape matches the old (pre-SQLite) `DailyLog` type in src/types/index.ts.
+type LegacyDailyLog = {
+  id: string;
+  activityId: string;
+  date: string;
+  completedAt?: string;
+  selectedNiyyahIds?: string[];
 };
 
 const DEFAULT_ENABLED_IDS = new Set(DEFAULT_ACTIVITY_IDS);
@@ -228,6 +253,142 @@ async function migrateLegacyActivitiesIfNeeded() {
   await markMigrated();
 }
 
+// one‑time migration for legacy journal entries (mmkv → sqlite); run after seedContent() and before clearStaleMmkvContentIfNeeded()
+async function migrateLegacyJournalIfNeeded() {
+  const migrated = await getContentMetaValue(JOURNAL_MIGRATED_KEY);
+  if (migrated === "1") return;
+
+  const markMigrated = () =>
+    db
+      .insert(contentMeta)
+      .values({ key: JOURNAL_MIGRATED_KEY, value: "1" })
+      .onConflictDoUpdate({
+        target: contentMeta.key,
+        set: { value: "1" },
+      });
+
+  const raw = storage.getString("@niyyah_journal");
+  if (!raw) {
+    await markMigrated();
+    return;
+  }
+
+  let legacyEntries: LegacyJournalEntry[] = [];
+  let parsedStateKeys: string[] = [];
+  try {
+    const parsed = JSON.parse(raw);
+    parsedStateKeys = parsed?.state ? Object.keys(parsed.state) : [];
+    legacyEntries = parsed?.state?.journalEntries ?? [];
+  } catch (err) {
+    Sentry.captureException(err);
+    await markMigrated();
+    return;
+  }
+
+  if (legacyEntries.length === 0) {
+    if (parsedStateKeys.length > 0) {
+      Sentry.addBreadcrumb({
+        category: "migration",
+        message: "migrateLegacyJournalIfNeeded found raw data but extracted 0 entries",
+        data: { parsedStateKeys },
+        level: "warning",
+      });
+    }
+    await markMigrated();
+    return;
+  }
+
+  await db.transaction(async (tx) => {
+    for (const e of legacyEntries) {
+      const createdAt = e.createdAt ? new Date(e.createdAt) : new Date();
+      await tx
+        .insert(journalEntries)
+        .values({
+          id: e.id,
+          activityId: e.activityId,
+          activityNameEn: e.activityName?.en ?? "",
+          activityNameAr: e.activityName?.ar ?? "",
+          note: e.note ?? "",
+          selectedNiyyahCount: e.selectedNiyyahCount ?? 0,
+          impactfulNiyyahId: e.impactfulNiyyah ?? null,
+          createdAt: Number.isNaN(createdAt.getTime()) ? new Date() : createdAt,
+        })
+        .onConflictDoNothing();
+    }
+  });
+
+  await markMigrated();
+}
+
+// one‑time migration for legacy daily logs (mmkv → sqlite); run after seedContent() and before clearStaleMmkvContentIfNeeded()
+async function migrateLegacyDailyLogsIfNeeded() {
+  const migrated = await getContentMetaValue(DAILY_LOGS_MIGRATED_KEY);
+  if (migrated === "1") return;
+
+  const markMigrated = () =>
+    db
+      .insert(contentMeta)
+      .values({ key: DAILY_LOGS_MIGRATED_KEY, value: "1" })
+      .onConflictDoUpdate({
+        target: contentMeta.key,
+        set: { value: "1" },
+      });
+
+  const raw = storage.getString("@niyyah_daily_logs");
+  if (!raw) {
+    await markMigrated();
+    return;
+  }
+
+  let legacyLogs: LegacyDailyLog[] = [];
+  let parsedStateKeys: string[] = [];
+  try {
+    const parsed = JSON.parse(raw);
+    parsedStateKeys = parsed?.state ? Object.keys(parsed.state) : [];
+    legacyLogs = parsed?.state?.dailyLogs ?? [];
+  } catch (err) {
+    Sentry.captureException(err);
+    await markMigrated();
+    return;
+  }
+
+  if (legacyLogs.length === 0) {
+    if (parsedStateKeys.length > 0) {
+      Sentry.addBreadcrumb({
+        category: "migration",
+        message: "migrateLegacyDailyLogsIfNeeded found raw data but extracted 0 logs",
+        data: { parsedStateKeys },
+        level: "warning",
+      });
+    }
+    await markMigrated();
+    return;
+  }
+
+  await db.transaction(async (tx) => {
+    for (const log of legacyLogs) {
+      const completedAt = log.completedAt ? new Date(log.completedAt) : new Date();
+      await tx
+        .insert(dailyLogs)
+        .values({
+          id: log.id,
+          activityId: log.activityId,
+          date: log.date,
+          completedAt: Number.isNaN(completedAt.getTime()) ? new Date() : completedAt,
+        })
+        .onConflictDoNothing();
+
+      for (const niyyahId of log.selectedNiyyahIds ?? []) {
+        await tx
+          .insert(dailyLogNiyyahs)
+          .values({ dailyLogId: log.id, niyyahId });
+      }
+    }
+  });
+
+  await markMigrated();
+}
+
 // One-time MMKV cleanup
 async function clearStaleMmkvContentIfNeeded() {
   const cleared = await getContentMetaValue(MMKV_CLEARED_KEY);
@@ -255,5 +416,7 @@ export async function seedIfNeeded() {
   }
 
   await migrateLegacyActivitiesIfNeeded();
+  await migrateLegacyJournalIfNeeded();
+  await migrateLegacyDailyLogsIfNeeded();
   await clearStaleMmkvContentIfNeeded();
 }
