@@ -49,3 +49,8 @@ ExcelToJson.js
 assets/images/old
 .vscode
 assets/store/*
+# Agent & Planning Docs
+.agents/
+*plan.md
+*-session-handoff.md
+CLAUDE.md
