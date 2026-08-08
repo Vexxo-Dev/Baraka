@@ -2,6 +2,7 @@ import { evaluateStreakRisk } from "@/services/notifications";
 import DashboardStats from "@components/Home/DashboardStats";
 import HadithCard from "@components/Home/HadithCard";
 import NiyyahCard from "@components/NiyyahCard";
+import { ActivityCardSkeletonList } from "@components/Home/ActivityCardSkeleton";
 import StreakBadge from "@components/StreakBadge";
 import { AnimatedPressable } from "@components/UI/AnimatedPressable";
 import { AppButton } from "@components/UI/AppButton";
@@ -36,7 +37,8 @@ export default function TodayScreen() {
   const insets = useSafeAreaInsets();
   const isWeb = Platform.OS === "web";
 
-  const rawEnabledActivities = useEnabledActivities();
+  const { activities: rawEnabledActivities, isLoading } =
+    useEnabledActivities();
 
   const { streak, isCompletedToday, getTodayAjrMultiplier } = useDailyLogs();
   const { markComplete, unmarkComplete } = useDailyLogActions();
@@ -217,7 +219,9 @@ export default function TodayScreen() {
             </AnimatedPressable>
           </View>
         </View>
-        {enabledActivities.length === 0 ? (
+        {isLoading ? (
+          <ActivityCardSkeletonList />
+        ) : enabledActivities.length === 0 ? (
           <Animated.View entering={FadeInDown.duration(300).delay(100)}>
             <View
               style={[

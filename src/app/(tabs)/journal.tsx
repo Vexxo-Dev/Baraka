@@ -7,6 +7,7 @@ import { AppText } from "@components/UI/AppText";
 import { AppTextInput } from "@components/UI/AppTextInput";
 import { ChipSelector } from "@components/UI/ChipSelector";
 import { EmptyState } from "@components/UI/EmptyState";
+import { JournalCardSkeletonList } from "@components/Journal/JournalCardSkeleton";
 import { useTheme } from "@context/ThemeContext";
 import { Feather } from "@expo/vector-icons";
 
@@ -40,6 +41,7 @@ export default function JournalScreen() {
     setFilterActivity,
     search,
     setSearch,
+    isLoading,
   } = useFilteredJournal();
 
   const { addJournalEntry, updateJournalEntry, deleteJournalEntry } =
@@ -209,7 +211,9 @@ export default function JournalScreen() {
           />
         )}
 
-        {journalEntries.length === 0 && !showAdd && (
+        {isLoading && <JournalCardSkeletonList />}
+
+        {!isLoading && journalEntries.length === 0 && !showAdd && (
           <EmptyState
             icon='feather'
             title={t("journal.empty.title")}

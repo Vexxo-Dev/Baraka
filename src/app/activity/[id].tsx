@@ -4,6 +4,7 @@ import { useLocalSearchParams } from "expo-router";
 import { useTheme } from "@context/ThemeContext";
 import { useActivityDetail } from "@hooks/useActivityDetail";
 import { ActivityNotFound } from "@components/Activity/ActivityNotFound";
+import { ActivityDetailSkeleton } from "@components/Activity/ActivityDetailSkeleton";
 import { ActivityViewStep } from "@components/Activity/ActivityViewStep";
 import { ActivityReflectStep } from "@components/Activity/ActivityReflectStep";
 import { SettingsToast } from "@components/Settings/SettingsToast";
@@ -12,6 +13,10 @@ export default function ActivityDetailScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
   const state = useActivityDetail(id);
   const { colors: C } = useTheme();
+
+  if (state.isLoading) {
+    return <ActivityDetailSkeleton />;
+  }
 
   if (!state.activity) {
     return <ActivityNotFound />;
