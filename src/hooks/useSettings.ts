@@ -38,9 +38,9 @@ export function useSettings() {
 
   const settings = useSettingsStore((s) => s.settings);
   const updateSettings = useSettingsStore((s) => s.updateSettings);
-  const enabledActivities = useEnabledActivities();
+  const { activities: enabledActivities } = useEnabledActivities();
   const { logs: dailyLogs, streak } = useDailyLogs();
-  const journalEntries = useJournalEntries();
+  const { entries: journalEntries } = useJournalEntries();
 
 
   const { toastMessage, showToast, animatedToastStyle } = useToast();

@@ -7,12 +7,19 @@ import { getTodayString } from "@utils/date";
 import { useToday } from "@hooks/useToday";
 
 export function useDailyLogs() {
-  const { data: allLogs } = useLiveQuery(db.select().from(dailyLogs));
-  const { data: allNiyyahs } = useLiveQuery(db.select().from(dailyLogNiyyahs));
+  const { data: allLogs, updatedAt: logsUpdatedAt } = useLiveQuery(
+    db.select().from(dailyLogs),
+  );
+  const { data: allNiyyahs, updatedAt: niyyahsUpdatedAt } = useLiveQuery(
+    db.select().from(dailyLogNiyyahs),
+  );
 
   const logs = allLogs ?? [];
   const niyyahRows = allNiyyahs ?? [];
   const today = useToday();
+
+  const isLoading =
+    logsUpdatedAt === undefined || niyyahsUpdatedAt === undefined;
 
   const todayLogs = useMemo(
     () => logs.filter((l) => l.date === today),
@@ -56,6 +63,7 @@ export function useDailyLogs() {
     getTodayNiyyahIds,
     streak,
     getTodayAjrMultiplier,
+    isLoading,
   };
 }
 

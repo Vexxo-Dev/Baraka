@@ -24,7 +24,7 @@ export default function ManageActivitiesScreen() {
   const insets = useSafeAreaInsets();
   const isWeb = Platform.OS === "web";
 
-  const activities = useAllActivities();
+  const { activities } = useAllActivities();
   const { toggleActivity } = useActivityActions();
   const [showAddForm, setShowAddForm] = useState(false);
   const [lastToggledCategory, setLastToggledCategory] = useState<string | null>(null);

@@ -15,7 +15,12 @@ export type DbJournalEntry = {
   createdAt: Date;
 };
 
-export function useJournalEntries(): DbJournalEntry[] {
+export type JournalState = {
+  entries: DbJournalEntry[];
+  isLoading: boolean;
+};
+
+export function useJournalEntries(): JournalState {
   const { language } = useLanguage();
 
   const query = useMemo(
@@ -38,10 +43,16 @@ export function useJournalEntries(): DbJournalEntry[] {
     [language],
   );
 
-  const { data } = useLiveQuery(query, [language]);
+  const { data, updatedAt } = useLiveQuery(query, [language]);
 
-  return (data ?? []).map((row) => ({
-    ...row,
-    createdAt: new Date(row.createdAt),
-  }));
+  const entries = useMemo(
+    () =>
+      (data ?? []).map((row) => ({
+        ...row,
+        createdAt: new Date(row.createdAt),
+      })),
+    [data],
+  );
+
+  return { entries, isLoading: updatedAt === undefined };
 }

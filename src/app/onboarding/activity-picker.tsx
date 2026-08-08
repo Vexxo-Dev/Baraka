@@ -26,7 +26,7 @@ export default function ActivityPickerScreen() {
   const { complete } = useOnboarding();
   const { setEnabledActivities } = useActivityActions();
 
-  const allActivities = useAllActivities();
+  const { activities: allActivities } = useAllActivities();
 
   const { prayerActivities, otherActivities } = useMemo(() => {
     const prayers: DbUserActivity[] = [];

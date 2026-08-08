@@ -28,7 +28,7 @@ export function useActivityDetail(id: string) {
   const settings = useSettingsStore((s) => s.settings);
   const getProfileTags = useSettingsStore((s) => s.getProfileTags);
 
-  const allActivities = useAllActivities();
+  const { activities: allActivities, isLoading } = useAllActivities();
   const activity = allActivities.find((a) => a.id === id);
 
   const { isCompletedToday, getTodayNiyyahIds } = useDailyLogs();
@@ -179,6 +179,7 @@ export function useActivityDetail(id: string) {
 
   return {
     activity,
+    isLoading,
     activityName,
     completed,
     allAdvanced,

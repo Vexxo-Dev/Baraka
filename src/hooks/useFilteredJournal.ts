@@ -4,8 +4,8 @@ import { useJournalEntries, type DbJournalEntry } from "@hooks/db/useJournal";
 import { useLanguage } from "@i18n";
 
 export function useFilteredJournal() {
-  const journalEntries = useJournalEntries();
-  const enabledActivities = useEnabledActivities();
+  const { entries: journalEntries, isLoading } = useJournalEntries();
+  const { activities: enabledActivities } = useEnabledActivities();
   const { language: lang } = useLanguage();
 
   const [filterActivity, setFilterActivity] = useState("__all__");
@@ -40,15 +40,18 @@ export function useFilteredJournal() {
   }, [filtered, lang]);
 
   useEffect(() => {
+    if (isLoading) return;
+
     if (filterActivity !== "__all__") {
       const hasEntriesForFilter = journalEntries.some(
         (e) => e.activityId === filterActivity
       );
+
       if (!hasEntriesForFilter) {
         setFilterActivity("__all__");
       }
     }
-  }, [journalEntries, filterActivity]);
+  }, [journalEntries, filterActivity, isLoading]);
 
   return {
     journalEntries,
@@ -59,5 +62,6 @@ export function useFilteredJournal() {
     setFilterActivity,
     search,
     setSearch,
+    isLoading,
   };
 }

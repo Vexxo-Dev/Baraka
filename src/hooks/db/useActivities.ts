@@ -18,7 +18,12 @@ export type DbUserActivity = {
   isCustom: boolean;
 };
 
-function useBuiltinActivities(): DbUserActivity[] {
+export type ActivitiesState = {
+  activities: DbUserActivity[];
+  isLoading: boolean;
+};
+
+function useBuiltinActivities(): ActivitiesState {
   const { language } = useLanguage();
 
   const activitiesQuery = useMemo(
@@ -39,12 +44,19 @@ function useBuiltinActivities(): DbUserActivity[] {
         .from(activities),
     [language],
   );
-  const { data: activitiesData } = useLiveQuery(activitiesQuery, [language]);
+  const { data: activitiesData, updatedAt: activitiesUpdatedAt } =
+    useLiveQuery(activitiesQuery, [language]);
 
   const prefsQuery = useMemo(() => db.select().from(userActivityPrefs), []);
-  const { data: prefsData } = useLiveQuery(prefsQuery, []);
+  const { data: prefsData, updatedAt: prefsUpdatedAt } = useLiveQuery(
+    prefsQuery,
+    [],
+  );
 
-  return useMemo(() => {
+  const isLoading =
+    activitiesUpdatedAt === undefined || prefsUpdatedAt === undefined;
+
+  const activityList = useMemo(() => {
     const prefsById = new Map(
       (prefsData ?? []).map((p) => [p.activityId, p]),
     );
@@ -64,9 +76,11 @@ function useBuiltinActivities(): DbUserActivity[] {
       };
     });
   }, [activitiesData, prefsData]);
+
+  return { activities: activityList, isLoading };
 }
 
-function useCustomActivitiesList(): DbUserActivity[] {
+function useCustomActivitiesList(): ActivitiesState {
   const { language } = useLanguage();
 
   const query = useMemo(
@@ -87,30 +101,52 @@ function useCustomActivitiesList(): DbUserActivity[] {
     [language],
   );
 
-  const { data } = useLiveQuery(query, [language]);
+  const { data, updatedAt } = useLiveQuery(query, [language]);
 
-  return (data ?? []).map((row) => ({
-    id: row.id,
-    name: row.name,
-    category: row.category,
-    niyyahText: row.niyyahText,
-    hadithRef: null,
-    defaultTime: null,
-    enabled: row.isEnabled,
-    customTime: null,
-    customNiyyahText: null,
-    isCustom: true,
-  }));
+  const activityList = useMemo(
+    () =>
+      (data ?? []).map((row) => ({
+        id: row.id,
+        name: row.name,
+        category: row.category,
+        niyyahText: row.niyyahText,
+        hadithRef: null,
+        defaultTime: null,
+        enabled: row.isEnabled,
+        customTime: null,
+        customNiyyahText: null,
+        isCustom: true,
+      })),
+    [data],
+  );
+
+  return { activities: activityList, isLoading: updatedAt === undefined };
 }
 
-export function useAllActivities(): DbUserActivity[] {
+export function useAllActivities(): ActivitiesState {
   const builtin = useBuiltinActivities();
   const custom = useCustomActivitiesList();
-  return [...builtin, ...custom];
+
+  const activities = useMemo(
+    () => [...builtin.activities, ...custom.activities],
+    [builtin.activities, custom.activities],
+  );
+
+  return {
+    activities,
+    isLoading: builtin.isLoading || custom.isLoading,
+  };
 }
 
-export function useEnabledActivities(): DbUserActivity[] {
-  return useAllActivities().filter((a) => a.enabled);
+export function useEnabledActivities(): ActivitiesState {
+  const { activities, isLoading } = useAllActivities();
+
+  const enabled = useMemo(
+    () => activities.filter((a) => a.enabled),
+    [activities],
+  );
+
+  return { activities: enabled, isLoading };
 }
 
 export async function getActivityBilingualName(
