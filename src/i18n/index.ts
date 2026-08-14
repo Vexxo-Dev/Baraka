@@ -1,7 +1,6 @@
 import "intl-pluralrules";
 
 import { storage } from "@lib/storage";
-import { getLocales } from "expo-localization";
 import i18n from "i18next";
 import { initReactI18next, useTranslation } from "react-i18next";
 import { I18nManager } from "react-native";
@@ -36,19 +35,22 @@ const applyRTL = (lng: string) => {
   I18nManager.forceRTL(isRTL);
 };
 
+export let needsRTLReload = false;
 
+function syncInitialRTL() {
+  let lang: AppLanguage = FALLBACK;
 
-async function syncInitialRTL() {
   try {
     const savedLang = storage.getString(LANG_KEY);
-    if (savedLang) {
-      applyRTL(normalizeLanguage(savedLang));
-      return;
-    }
+    if (savedLang) lang = normalizeLanguage(savedLang);
   } catch {}
 
-  const deviceLang = getLocales()[0]?.languageCode;
-  applyRTL(normalizeLanguage(deviceLang));
+  const isRTL = RTL_LANGUAGES.includes(lang);
+
+  if (I18nManager.isRTL !== isRTL) {
+    applyRTL(lang);
+    needsRTLReload = true;
+  }
 }
 
 const languageDetector = {
@@ -63,8 +65,7 @@ const languageDetector = {
         return callback(savedLang);
       }
 
-      const deviceLang = getLocales()[0]?.languageCode;
-      return callback(normalizeLanguage(deviceLang));
+      return callback(FALLBACK);
     } catch {
       return callback(FALLBACK);
     }
@@ -80,7 +81,7 @@ const languageDetector = {
 };
 
 async function initI18n() {
-  await syncInitialRTL();
+  syncInitialRTL();
 
   await i18n
     .use(languageDetector)

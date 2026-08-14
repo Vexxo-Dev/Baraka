@@ -1,4 +1,4 @@
-import i18n from "@i18n";
+import i18n, { needsRTLReload } from "@i18n";
 import * as Sentry from "@sentry/react-native";
 import { Stack } from "expo-router";
 import * as SplashScreen from "expo-splash-screen";
@@ -20,7 +20,7 @@ import {
 } from "@/services/notifications";
 import { useLocalize } from "@hooks/useLocalize";
 import { useTranslation } from "react-i18next";
-import { getAnonymousUserId } from "@/utils/device";
+import { getAnonymousUserId, reloadApp } from "@/utils/device";
 import { Platform } from "react-native";
 import { KeyboardProvider } from "react-native-keyboard-controller";
 import { useMigrations } from "drizzle-orm/expo-sqlite/migrator";
@@ -84,7 +84,10 @@ function RootLayoutNav() {
 function App() {
   const [i18nReady, setI18nReady] = useState(false);
   const isLoading = useSettingsStore((s) => s.isLoading);
-  const { success: migrationsSuccess, error: migrationsError } = useMigrations(db, migrations);
+  const { success: migrationsSuccess, error: migrationsError } = useMigrations(
+    db,
+    migrations,
+  );
   const [seedDone, setSeedDone] = useState(false);
   const settings = useSettingsStore((s) => s.settings);
   const localize = useLocalize();
@@ -101,6 +104,12 @@ function App() {
     i18n.on("initialized", onInit);
     return () => i18n.off("initialized", onInit);
   }, []);
+
+  useEffect(() => {
+    if (i18nReady && needsRTLReload) {
+      reloadApp();
+    }
+  }, [i18nReady]);
 
   useEffect(() => {
     if (!migrationsSuccess) return;
@@ -126,14 +135,21 @@ function App() {
         settings.notificationsEnabled,
       );
 
-      getFreshDailyLogState().then(({ streak, completedSomethingToday }) => {
-        evaluateStreakRisk({
-          notificationsEnabled: settings.notificationsEnabled,
-          streakCount: streak,
-          completedSomethingToday,
-          t,
-        });
-      });
+      getFreshDailyLogState()
+        .then(({ streak, completedSomethingToday }) =>
+          evaluateStreakRisk({
+            notificationsEnabled: settings.notificationsEnabled,
+            streakCount: streak,
+            completedSomethingToday,
+            t,
+          }),
+        )
+        .catch((error) =>
+          Sentry.captureException(error, {
+            tags: { feature: "notifications" },
+            extra: { phase: "bootStreakRiskEvaluation" },
+          }),
+        );
     }
   }, [
     i18nReady,
@@ -167,8 +183,6 @@ function App() {
   if (migrationsError) {
     Sentry.captureException(migrationsError);
   }
-
-
 
   return (
     <GestureHandlerRootView style={{ flex: 1 }}>

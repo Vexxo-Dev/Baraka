@@ -1,5 +1,5 @@
 import React from "react";
-import { View, StyleSheet } from "react-native";
+import { View, StyleSheet, I18nManager } from "react-native";
 import { AppBottomSheet } from "@components/UI/AppBottomSheet";
 import { BottomSheetModal } from "@gorhom/bottom-sheet";
 import { AppText } from "@components/UI/AppText";
@@ -15,85 +15,91 @@ interface LanguageSheetProps {
   onSelect: (lang: "en" | "ar") => void;
 }
 
-export const LanguageSheet = React.forwardRef<BottomSheetModal, LanguageSheetProps>(
-  ({ currentLang, onSelect }, ref) => {
-    const { t } = useTranslation();
-    const { colors: C } = useTheme();
+export const LanguageSheet = React.forwardRef<
+  BottomSheetModal,
+  LanguageSheetProps
+>(({ currentLang, onSelect }, ref) => {
+  const { t } = useTranslation();
+  const { colors: C } = useTheme();
 
-    return (
-      <AppBottomSheet
-        ref={ref}
-        snapPoints={["35%"]}
-        enablePanDownToClose
+  return (
+    <AppBottomSheet ref={ref} snapPoints={["35%"]} enablePanDownToClose>
+      <AppText
+        weight='Bold'
+        variant='subtitle'
+        style={[styles.sheetTitle, { color: C.text }]}
       >
-        <AppText
-          weight="Bold"
-          variant="subtitle"
-          style={[styles.sheetTitle, { color: C.text }]}
+        {t("settings.selectLanguage", "Select Language")}
+      </AppText>
+      <AppText
+        weight='Regular'
+        variant='body'
+        style={[styles.sheetDesc, { color: C.textMuted }]}
+      >
+        {t(
+          "settings.selectLanguageDesc",
+          "Choose your preferred language for the app interface.",
+        )}
+      </AppText>
+
+      <View style={styles.sheetOptions}>
+        <AnimatedPressable
+          style={[
+            styles.langOption,
+            {
+              flexDirection: I18nManager.isRTL ? "row-reverse" : "row",
+              backgroundColor:
+                currentLang === "en" ? C.tint + "15" : C.border + "50",
+            },
+            currentLang === "en" && { borderColor: C.tint, borderWidth: 1 },
+          ]}
+          onPress={() => onSelect("en")}
         >
-          {t("settings.selectLanguage", "Select Language")}
-        </AppText>
-        <AppText
-          weight="Regular"
-          variant="body"
-          style={[styles.sheetDesc, { color: C.textMuted }]}
-        >
-          {t(
-            "settings.selectLanguageDesc",
-            "Choose your preferred language for the app interface."
+          <AppText
+            weight='Medium'
+            variant='body'
+            style={{
+              color: currentLang === "en" ? C.tint : C.text,
+              fontFamily: "SourceSerif4-Medium",
+            }}
+          >
+            English
+          </AppText>
+          {currentLang === "en" && (
+            <Feather name='check' size={20} color={C.tint} />
           )}
-        </AppText>
+        </AnimatedPressable>
 
-        <View style={styles.sheetOptions}>
-          <AnimatedPressable
-            style={[
-              styles.langOption,
-              {
-                backgroundColor:
-                  currentLang === "en" ? C.tint + "15" : C.border + "50",
-              },
-              currentLang === "en" && { borderColor: C.tint, borderWidth: 1 },
-            ]}
-            onPress={() => onSelect("en")}
+        <AnimatedPressable
+          style={[
+            styles.langOption,
+            {
+              flexDirection: I18nManager.isRTL ? "row" : "row-reverse",
+              backgroundColor:
+                currentLang === "ar" ? C.tint + "15" : C.border + "50",
+            },
+            currentLang === "ar" && { borderColor: C.tint, borderWidth: 1 },
+          ]}
+          onPress={() => onSelect("ar")}
+        >
+          <AppText
+            weight='Medium'
+            variant='body'
+            style={{
+              color: currentLang === "ar" ? C.tint : C.text,
+              fontFamily: "Tajawal-Medium",
+            }}
           >
-            <AppText
-              weight="Medium"
-              variant="body"
-              style={{ color: currentLang === "en" ? C.tint : C.text }}
-            >
-              English
-            </AppText>
-            {currentLang === "en" && <Feather name="check" size={20} color={C.tint} />}
-          </AnimatedPressable>
-
-          <AnimatedPressable
-            style={[
-              styles.langOption,
-              {
-                backgroundColor:
-                  currentLang === "ar" ? C.tint + "15" : C.border + "50",
-              },
-              currentLang === "ar" && { borderColor: C.tint, borderWidth: 1 },
-            ]}
-            onPress={() => onSelect("ar")}
-          >
-            <AppText
-              weight="Medium"
-              variant="body"
-              style={{
-                color: currentLang === "ar" ? C.tint : C.text,
-                fontFamily: "Tajawal-Medium",
-              }}
-            >
-              عربي
-            </AppText>
-            {currentLang === "ar" && <Feather name="check" size={20} color={C.tint} />}
-          </AnimatedPressable>
-        </View>
-      </AppBottomSheet>
-    );
-  }
-);
+            عربي
+          </AppText>
+          {currentLang === "ar" && (
+            <Feather name='check' size={20} color={C.tint} />
+          )}
+        </AnimatedPressable>
+      </View>
+    </AppBottomSheet>
+  );
+});
 
 const styles = StyleSheet.create({
   sheetTitle: {
