@@ -14,6 +14,7 @@ interface PreferencesSectionProps {
   lang: string;
   themePreference: "light" | "auto" | "dark";
   notificationsActive: boolean;
+  notificationsToggling: boolean;
   formattedReminderTime: string;
   onNotificationToggle: (v: boolean) => void;
   onTimePickerOpen: () => void;
@@ -26,6 +27,7 @@ export const PreferencesSection = React.memo(
     lang,
     themePreference,
     notificationsActive,
+    notificationsToggling,
     formattedReminderTime,
     onNotificationToggle,
     onTimePickerOpen,
@@ -103,6 +105,7 @@ export const PreferencesSection = React.memo(
               <Switch
                 value={notificationsActive}
                 onValueChange={onNotificationToggle}
+                disabled={notificationsToggling}
                 trackColor={{ false: C.border, true: C.tint + "80" }}
                 thumbColor={notificationsActive ? C.tint : C.textMuted}
                 ios_backgroundColor={C.border}

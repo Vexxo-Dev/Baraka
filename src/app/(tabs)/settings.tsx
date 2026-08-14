@@ -32,6 +32,7 @@ export default function SettingsScreen() {
     lang,
     updateSettings,
     notificationsActive,
+    notificationsToggling,
     formattedReminderTime,
     toastMessage,
     animatedToastStyle,
@@ -100,6 +101,7 @@ export default function SettingsScreen() {
           lang={lang}
           themePreference={settings.darkMode || "auto"}
           notificationsActive={notificationsActive}
+          notificationsToggling={notificationsToggling}
           formattedReminderTime={formattedReminderTime}
           onNotificationToggle={handleNotificationToggle}
           onTimePickerOpen={() => setShowTimePicker(true)}

@@ -1,4 +1,4 @@
-import { useMemo, useCallback } from "react";
+import { useMemo, useCallback, useState } from "react";
 import { Alert, Linking, Share } from "react-native";
 import { useTranslation } from "react-i18next";
 import { useLanguage } from "@i18n";
@@ -46,11 +46,20 @@ export function useSettings() {
   const { toastMessage, showToast, animatedToastStyle } = useToast();
 
 
+  const [pendingNotifications, setPendingNotifications] = useState<
+    boolean | null
+  >(null);
+
   const notificationsActive = useMemo(
     () =>
-      settings.notificationsEnabled &&
-      settings.notificationsStatus === "granted",
-    [settings.notificationsEnabled, settings.notificationsStatus],
+      pendingNotifications ??
+      (settings.notificationsEnabled &&
+        settings.notificationsStatus === "granted"),
+    [
+      pendingNotifications,
+      settings.notificationsEnabled,
+      settings.notificationsStatus,
+    ],
   );
 
 
@@ -79,48 +88,63 @@ export function useSettings() {
 
   const handleNotificationToggle = useCallback(
     async (v: boolean) => {
-      if (v) {
-        const status = await registerForPushNotificationsAsync();
-        updateSettings({
-          notificationsStatus: status,
-          notificationsEnabled: status === "granted",
-        });
+      if (pendingNotifications !== null) return; // already mid-toggle
 
-        if (status === "granted") {
-          Haptic.success();
-          await scheduleDailyNotifications(
-            settings.reminderTime || "08:00",
-            localize,
-          );
-          const completedSomethingToday = dailyLogs.some(
-            (l) => l.date === getTodayString(),
-          );
-          await evaluateStreakRisk({
-            notificationsEnabled: true,
-            streakCount: streak,
-            completedSomethingToday,
-            t,
+      setPendingNotifications(v);
+      try {
+        if (v) {
+          const status = await registerForPushNotificationsAsync();
+          updateSettings({
+            notificationsStatus: status,
+            notificationsEnabled: status === "granted",
           });
+
+          if (status === "granted") {
+            Haptic.success();
+            await scheduleDailyNotifications(
+              settings.reminderTime || "08:00",
+              localize,
+            );
+            const completedSomethingToday = dailyLogs.some(
+              (l) => l.date === getTodayString(),
+            );
+            await evaluateStreakRisk({
+              notificationsEnabled: true,
+              streakCount: streak,
+              completedSomethingToday,
+              t,
+            });
+          } else {
+            Alert.alert(
+              t("settings.notifPermissionTitle"),
+              t("settings.notifPermissionMessage"),
+              [
+                { text: t("common.cancel"), style: "cancel" },
+                {
+                  text: t("settings.openSettings"),
+                  onPress: () => Linking.openSettings(),
+                },
+              ],
+            );
+          }
         } else {
-          Alert.alert(
-            t("settings.notifPermissionTitle"),
-            t("settings.notifPermissionMessage"),
-            [
-              { text: t("common.cancel"), style: "cancel" },
-              {
-                text: t("settings.openSettings"),
-                onPress: () => Linking.openSettings(),
-              },
-            ],
-          );
+          updateSettings({ notificationsEnabled: false });
+          await cancelDailyNotifications();
+          await cancelStreakRiskNotification();
         }
-      } else {
-        updateSettings({ notificationsEnabled: false });
-        await cancelDailyNotifications();
-        await cancelStreakRiskNotification();
+      } finally {
+        setPendingNotifications(null);
       }
     },
-    [settings.reminderTime, updateSettings, localize, t, dailyLogs, streak],
+    [
+      pendingNotifications,
+      settings.reminderTime,
+      updateSettings,
+      localize,
+      t,
+      dailyLogs,
+      streak,
+    ],
   );
 
   const handleTimeChange = useCallback(
@@ -191,6 +215,7 @@ export function useSettings() {
     lang,
     updateSettings,
     notificationsActive,
+    notificationsToggling: pendingNotifications !== null,
     formattedReminderTime,
     toastMessage,
     animatedToastStyle,
