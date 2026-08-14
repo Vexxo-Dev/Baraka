@@ -169,32 +169,32 @@ export async function cancelDailyNotifications() {
 const STREAK_RISK_IDENTIFIER = "streak-risk";
 const STREAK_RISK_HOUR = 21; // 9 PM local device time — separate concern from the user's chosen daily reminderTime
 
-/**
- * Schedules a single one-shot notification warning the user they're about to
- * lose their streak, if — and only if — they're actually at risk right now:
- * notifications enabled + granted, streak > 0, and nothing completed yet
- * today. Unlike scheduleDailyNotifications, this is never a multi-day batch —
- * "at risk" is an inherently today-only condition, so it's re-evaluated and
- * rescheduled reactively (see evaluateStreakRisk) rather than pre-scheduled
- * in advance.
- */
 export async function scheduleStreakRiskNotification(
   streakCount: number,
   t: (key: string, options?: Record<string, unknown>) => string,
+  daysAhead: number = 0,
 ) {
   try {
     await cancelStreakRiskNotification();
 
     const now = new Date();
-    const triggerDate = new Date(
+    let triggerDate = new Date(
       now.getFullYear(),
       now.getMonth(),
-      now.getDate(),
+      now.getDate() + daysAhead,
       STREAK_RISK_HOUR,
       0,
     );
 
-    if (triggerDate <= now) return;
+    if (daysAhead === 0 && triggerDate <= now) {
+      triggerDate = new Date(
+        now.getFullYear(),
+        now.getMonth(),
+        now.getDate() + 1,
+        STREAK_RISK_HOUR,
+        0,
+      );
+    }
 
     await Notifications.scheduleNotificationAsync({
       identifier: STREAK_RISK_IDENTIFIER,
@@ -220,7 +220,9 @@ export async function scheduleStreakRiskNotification(
 
 export async function cancelStreakRiskNotification() {
   try {
-    await Notifications.cancelScheduledNotificationAsync(STREAK_RISK_IDENTIFIER);
+    await Notifications.cancelScheduledNotificationAsync(
+      STREAK_RISK_IDENTIFIER,
+    );
   } catch {
     // no-op — nothing was scheduled, which is a valid state, not an error
   }
@@ -230,23 +232,37 @@ export async function cancelStreakRiskNotification() {
  * Central decision point for whether a streak-risk notification should exist
  * right now. Call this after anything that could change the answer: app
  * boot, marking/unmarking an activity complete, or toggling notifications.
+ *
+ * Keeps the reminder armed one day ahead: completing something today clears
+ * today's risk but guarantees tomorrow's, so we re-arm for tomorrow rather
+ * than cancelling outright. Without this the notification would only ever be
+ * (re)scheduled while the app is open, so a user who completes an activity and
+ * then never reopens the app would silently lose their streak reminder.
  */
-export async function evaluateStreakRisk(params: {
+
+interface EvaluateStreakRiskParams {
   notificationsEnabled: boolean;
   streakCount: number;
   completedSomethingToday: boolean;
   t: (key: string, options?: Record<string, unknown>) => string;
-}) {
-  const { notificationsEnabled, streakCount, completedSomethingToday, t } = params;
+}
 
-  const atRisk = notificationsEnabled && streakCount > 0 && !completedSomethingToday;
-
-  if (!atRisk) {
+export async function evaluateStreakRisk({
+  notificationsEnabled,
+  streakCount,
+  completedSomethingToday,
+  t,
+}: EvaluateStreakRiskParams) {
+  if (!notificationsEnabled || streakCount < 1) {
     await cancelStreakRiskNotification();
     return;
   }
 
-  await scheduleStreakRiskNotification(streakCount, t);
+  await scheduleStreakRiskNotification(
+    streakCount,
+    t,
+    completedSomethingToday ? 1 : 0,
+  );
 }
 
 export async function recheckAndRescheduleIfNeeded(

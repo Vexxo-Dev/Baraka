@@ -15,6 +15,7 @@ import { useNiyyahSelection } from "./useNiyyahSelection";
 import { useToast } from "@hooks/useToast";
 import { Haptic } from "@utils/haptics";
 import { evaluateStreakRisk } from "@/services/notifications";
+import * as Sentry from "@sentry/react-native";
 
 type Step = "view" | "reflect";
 
@@ -93,21 +94,29 @@ export function useActivityDetail(id: string) {
     });
   }, [activity]);
 
-  const refreshStreakRisk = useCallback(async () => {
-    const { streak, completedSomethingToday } = await getFreshDailyLogState();
-    evaluateStreakRisk({
-      notificationsEnabled: settings.notificationsEnabled,
-      streakCount: streak,
-      completedSomethingToday,
-      t,
-    });
+  const refreshStreakRisk = useCallback(() => {
+    getFreshDailyLogState()
+      .then(({ streak, completedSomethingToday }) =>
+        evaluateStreakRisk({
+          notificationsEnabled: settings.notificationsEnabled,
+          streakCount: streak,
+          completedSomethingToday,
+          t,
+        }),
+      )
+      .catch((error) =>
+        Sentry.captureException(error, {
+          tags: { feature: "notifications" },
+          extra: { phase: "refreshStreakRisk" },
+        }),
+      );
   }, [settings.notificationsEnabled, t]);
 
   const handleSaveAndRenew = useCallback(async () => {
     if (!activity) return;
     Haptic.success();
     await markComplete(activity.id, cleanSelected);
-    await refreshStreakRisk();
+    refreshStreakRisk();
     setStep("reflect");
   }, [activity, cleanSelected, markComplete, refreshStreakRisk]);
 
@@ -115,7 +124,7 @@ export function useActivityDetail(id: string) {
     if (!activity) return;
     Haptic.lightTap();
     await unmarkComplete(activity.id);
-    await refreshStreakRisk();
+    refreshStreakRisk();
   }, [activity, unmarkComplete, refreshStreakRisk]);
 
   const handleSaveReflection = useCallback(async () => {
