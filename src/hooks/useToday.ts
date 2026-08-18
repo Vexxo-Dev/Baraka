@@ -5,8 +5,9 @@ import { getTodayString } from "@utils/date";
 export function useToday(): string {
   const [today, setToday] = useState(getTodayString);
 
-  // Zero-idle-cost fallback to catch foreground wall-clock jumps (e.g. timezone changes).
   const current = getTodayString();
+
+  // Zero-idle-cost fallback to catch foreground wall-clock jumps (e.g. timezone changes).
   if (current !== today) {
     setToday(current);
   }
