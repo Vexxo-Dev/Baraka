@@ -6,6 +6,7 @@ import {
   userActivityPrefs,
   customActivities,
   customNiyyahOptions,
+  dailyLogNiyyahs,
 } from "@/db/schema";
 import { generateCustomId } from "@utils/id";
 
@@ -112,9 +113,14 @@ export function useActivityActions() {
   );
 
   const deleteCustomNiyyahOption = useCallback(async (optionId: string) => {
-    await db
-      .delete(customNiyyahOptions)
-      .where(eq(customNiyyahOptions.id, optionId));
+    await db.transaction(async (tx) => {
+      await tx
+        .delete(dailyLogNiyyahs)
+        .where(eq(dailyLogNiyyahs.niyyahId, optionId));
+      await tx
+        .delete(customNiyyahOptions)
+        .where(eq(customNiyyahOptions.id, optionId));
+    });
   }, []);
 
   return {
