@@ -10,6 +10,7 @@
     "build:android": "bunx expo run:android --variant release",
     "build:eas:android": "eas build --platform android --profile production",
     "typecheck": "tsc -p tsconfig.json --noEmit",
+    "test": "jest",
     "clean": "bunx expo prebuild --clean",
     "db:generate": "drizzle-kit generate",
     "db:studio": "drizzle-kit studio"
@@ -52,9 +53,12 @@
     "zustand": "^5.0.12"
   },
   "devDependencies": {
+    "@types/jest": "^29.5.0",
     "@types/react": "~19.1.10",
     "babel-plugin-inline-import": "^3.0.0",
     "drizzle-kit": "^0.31.10",
+    "jest": "^29.7.0",
+    "jest-expo": "^54",
     "typescript": "~5.9.2"
   }
 }
