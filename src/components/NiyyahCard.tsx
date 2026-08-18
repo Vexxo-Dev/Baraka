@@ -7,7 +7,6 @@ import Animated, {
   withSequence,
   withTiming,
   withSpring,
-  LinearTransition,
   FadeIn,
   FadeOut,
 } from "react-native-reanimated";
@@ -55,7 +54,6 @@ export default function NiyyahCard({
 
   return (
     <Animated.View
-      layout={LinearTransition.duration(280)}
       style={[animatedStyle, { marginBottom: spacing.sm }]}
     >
       <AnimatedPressable
@@ -68,12 +66,10 @@ export default function NiyyahCard({
           },
         ]}
       >
-        <Animated.View
-          layout={LinearTransition.duration(280)}
+        <View
           style={[styles.content, isCompact && styles.contentCompact]}
         >
-          <Animated.View
-            layout={LinearTransition.duration(280)}
+          <View
             style={styles.textContainer}
           >
             <View style={styles.nameRow}>
@@ -109,7 +105,7 @@ export default function NiyyahCard({
                 </AppText>
               </Animated.View>
             )}
-          </Animated.View>
+          </View>
 
           <View style={styles.checkWrapper}>
             <AnimatedPressable
@@ -137,7 +133,7 @@ export default function NiyyahCard({
               />
             )}
           </View>
-        </Animated.View>
+        </View>
       </AnimatedPressable>
     </Animated.View>
   );
