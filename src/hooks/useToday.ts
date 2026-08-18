@@ -5,6 +5,12 @@ import { getTodayString } from "@utils/date";
 export function useToday(): string {
   const [today, setToday] = useState(getTodayString);
 
+  // Zero-idle-cost fallback to catch foreground wall-clock jumps (e.g. timezone changes).
+  const current = getTodayString();
+  if (current !== today) {
+    setToday(current);
+  }
+
   useEffect(() => {
     let timeoutId: ReturnType<typeof setTimeout>;
 
