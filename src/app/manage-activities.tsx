@@ -8,7 +8,8 @@ import { useActivityActions } from "@hooks/db/useActivityActions";
 import { Haptic } from "@utils/haptics";
 import { useState, useMemo, useCallback } from "react";
 import { useTranslation } from "react-i18next";
-import { Platform, ScrollView, StyleSheet, View } from "react-native";
+import { Platform, StyleSheet, View } from "react-native";
+import { KeyboardAwareScrollViewCompat } from "@components/KeyboardAwareScrollViewCompat";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { router } from "expo-router";
 
@@ -50,12 +51,13 @@ export default function ManageActivitiesScreen() {
 
   return (
     <View style={[styles.container, { backgroundColor: C.background }]}>
-      <ScrollView
+      <KeyboardAwareScrollViewCompat
         contentContainerStyle={[
           styles.scrollContent,
           { paddingTop: topPadding + spacing.lg, paddingBottom: isWeb ? 34 + 84 : 100 },
         ]}
         showsVerticalScrollIndicator={false}
+        keyboardShouldPersistTaps="handled"
       >
         <AnimatedPressable
           onPress={() => router.back()}
@@ -112,7 +114,7 @@ export default function ManageActivitiesScreen() {
             </Animated.View>
           );
         })}
-      </ScrollView>
+      </KeyboardAwareScrollViewCompat>
     </View>
   );
 }

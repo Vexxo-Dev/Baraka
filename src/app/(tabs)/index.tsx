@@ -22,7 +22,8 @@ import { parseReminderTime } from "@utils/parseReminderTime";
 import { router } from "expo-router";
 import { useCallback, useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
-import { Platform, ScrollView, StyleSheet, View } from "react-native";
+import { Platform, StyleSheet, View } from "react-native";
+import { KeyboardAwareScrollViewCompat } from "@components/KeyboardAwareScrollViewCompat";
 import Animated, {
   FadeInDown,
   FadeOut,
@@ -42,8 +43,8 @@ export default function TodayScreen() {
 
   const { streak, isCompletedToday, getTodayAjrMultiplier } = useDailyLogs();
   const { markComplete, unmarkComplete } = useDailyLogActions();
-  const notificationsEnabled = useSettingsStore(
-    (s) => s.settings.notificationsEnabled,
+  const streakNotificationsEnabled = useSettingsStore(
+    (s) => s.settings.streakNotificationsEnabled,
   );
 
   const { language: lang } = useLanguage();
@@ -73,7 +74,9 @@ export default function TodayScreen() {
     enabledActivities.length === 0
       ? 0
       : Math.round((completedCount / enabledActivities.length) * 100);
-  const ajr = getTodayAjrMultiplier();
+  const ajr = getTodayAjrMultiplier(
+    new Set(enabledActivities.map((a) => a.id)),
+  );
 
   const getDayGreeting = () => {
     const hour = new Date().getHours();
@@ -102,13 +105,19 @@ export default function TodayScreen() {
       const { streak: freshStreak, completedSomethingToday } =
         await getFreshDailyLogState();
       evaluateStreakRisk({
-        notificationsEnabled,
+        streakNotificationsEnabled,
         streakCount: freshStreak,
         completedSomethingToday,
         t,
       });
     },
-    [isCompletedToday, markComplete, unmarkComplete, notificationsEnabled, t],
+    [
+      isCompletedToday,
+      markComplete,
+      unmarkComplete,
+      streakNotificationsEnabled,
+      t,
+    ],
   );
 
   const handleCardPress = useCallback((activity: DbUserActivity) => {
@@ -134,7 +143,7 @@ export default function TodayScreen() {
 
   return (
     <View style={[styles.container, { backgroundColor: C.background }]}>
-      <ScrollView
+      <KeyboardAwareScrollViewCompat
         contentContainerStyle={[
           styles.scrollContent,
           {
@@ -143,6 +152,7 @@ export default function TodayScreen() {
           },
         ]}
         showsVerticalScrollIndicator={false}
+        keyboardShouldPersistTaps="handled"
       >
         <View style={styles.heroArea}>
           <View style={styles.header}>
@@ -245,7 +255,7 @@ export default function TodayScreen() {
                 variant='title'
                 style={{ color: C.text }}
               >
-                {t("common.noActivities", "Ready to start?")}
+                {t("dashboard.emptyTitle")}
               </AppText>
               <AppText
                 weight='Regular'
@@ -324,7 +334,7 @@ export default function TodayScreen() {
             </AppText>
           </View>
         )}
-      </ScrollView>
+      </KeyboardAwareScrollViewCompat>
     </View>
   );
 }

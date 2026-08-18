@@ -19,6 +19,7 @@ interface ChipSelectorProps {
   onSelect: (value: string) => void;
   style?: StyleProp<ViewStyle>;
   contentContainerStyle?: StyleProp<ViewStyle>;
+  keyboardShouldPersistTaps?: "always" | "never" | "handled" | boolean;
 }
 
 export function ChipSelector({
@@ -27,6 +28,7 @@ export function ChipSelector({
   onSelect,
   style,
   contentContainerStyle,
+  keyboardShouldPersistTaps = "handled",
 }: ChipSelectorProps) {
   const { colors: C } = useTheme();
 
@@ -34,6 +36,7 @@ export function ChipSelector({
     <ScrollView
       horizontal
       showsHorizontalScrollIndicator={false}
+      keyboardShouldPersistTaps={keyboardShouldPersistTaps}
       style={[styles.scroll, style]}
       contentContainerStyle={[styles.content, contentContainerStyle]}
     >

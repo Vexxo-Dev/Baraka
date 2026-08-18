@@ -3,10 +3,10 @@ import { LinearGradient } from "expo-linear-gradient";
 import { useTranslation } from "react-i18next";
 import {
   Platform,
-  ScrollView,
   StyleSheet,
   View,
 } from "react-native";
+import { KeyboardAwareScrollViewCompat } from "@components/KeyboardAwareScrollViewCompat";
 import { AnimatedPressable } from "@components/UI/AnimatedPressable";
 import { AppIcon } from "@components/UI/AppIcon";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
@@ -32,7 +32,7 @@ export default function EducationDetail({
 
   return (
     <View style={[styles.detailContainer, { backgroundColor: C.background }]}>
-      <ScrollView
+      <KeyboardAwareScrollViewCompat
         contentContainerStyle={[
           styles.detailContent,
           {
@@ -41,6 +41,7 @@ export default function EducationDetail({
           },
         ]}
         showsVerticalScrollIndicator={false}
+        keyboardShouldPersistTaps="handled"
       >
         <AnimatedPressable
           onPress={onClose}
@@ -118,7 +119,7 @@ export default function EducationDetail({
             </AppText>
           </View>
         </View>
-      </ScrollView>
+      </KeyboardAwareScrollViewCompat>
     </View>
   );
 }

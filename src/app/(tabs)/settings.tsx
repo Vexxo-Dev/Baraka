@@ -1,5 +1,6 @@
 import { useRef, useState } from "react";
-import { Platform, ScrollView, StyleSheet, View } from "react-native";
+import { Platform, StyleSheet, View } from "react-native";
+import { KeyboardAwareScrollViewCompat } from "@components/KeyboardAwareScrollViewCompat";
 import { useTranslation } from "react-i18next";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { BottomSheetModal } from "@gorhom/bottom-sheet";
@@ -33,11 +34,14 @@ export default function SettingsScreen() {
     updateSettings,
     notificationsActive,
     notificationsToggling,
+    streakNotificationsActive,
+    streakNotificationsToggling,
     formattedReminderTime,
     toastMessage,
     animatedToastStyle,
     handleProfileToggle,
     handleNotificationToggle,
+    handleStreakNotificationToggle,
     handleTimeChange,
     handleLanguageSelect,
     handleExportData,
@@ -72,7 +76,7 @@ export default function SettingsScreen() {
         isWeb={isWeb}
       />
 
-      <ScrollView
+      <KeyboardAwareScrollViewCompat
         contentContainerStyle={[
           styles.scrollContent,
           {
@@ -81,6 +85,7 @@ export default function SettingsScreen() {
           },
         ]}
         showsVerticalScrollIndicator={false}
+        keyboardShouldPersistTaps="handled"
       >
         <AppText weight="Bold" variant='hero' style={[styles.title, { color: C.gold }]}>
           {t("settings.title")}
@@ -102,8 +107,11 @@ export default function SettingsScreen() {
           themePreference={settings.darkMode || "auto"}
           notificationsActive={notificationsActive}
           notificationsToggling={notificationsToggling}
+          streakNotificationsActive={streakNotificationsActive}
+          streakNotificationsToggling={streakNotificationsToggling}
           formattedReminderTime={formattedReminderTime}
           onNotificationToggle={handleNotificationToggle}
+          onStreakNotificationToggle={handleStreakNotificationToggle}
           onTimePickerOpen={() => setShowTimePicker(true)}
           onLanguageOpen={() => langSheetRef.current?.present()}
           onThemeChange={(mode) => updateSettings({ darkMode: mode })}
@@ -115,7 +123,7 @@ export default function SettingsScreen() {
         />
 
         <AboutSection />
-      </ScrollView>
+      </KeyboardAwareScrollViewCompat>
 
       <ReminderTimePicker
         visible={showTimePicker}
