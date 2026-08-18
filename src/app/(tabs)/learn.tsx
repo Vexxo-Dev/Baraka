@@ -49,7 +49,7 @@ export default function LearnScreen() {
       <KeyboardAwareScrollViewCompat
         contentContainerStyle={[
           styles.scrollContent,
-          { paddingTop: topPadding + spacing.lg, paddingBottom: isWeb ? 34 + 84 : 100 },
+          { paddingTop: topPadding + spacing.lg, paddingBottom: isWeb ? 34 + 84 : 60 + insets.bottom + spacing.xxl },
         ]}
         showsVerticalScrollIndicator={false}
         keyboardShouldPersistTaps='handled'

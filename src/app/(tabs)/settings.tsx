@@ -81,7 +81,7 @@ export default function SettingsScreen() {
           styles.scrollContent,
           {
             paddingTop: (isWeb ? 67 : insets.top) + spacing.lg,
-            paddingBottom: isWeb ? 34 + 84 : 100,
+            paddingBottom: isWeb ? 34 + 84 : 60 + insets.bottom + spacing.xxl,
           },
         ]}
         showsVerticalScrollIndicator={false}

@@ -125,7 +125,7 @@ export default function JournalScreen() {
           styles.scrollContent,
           {
             paddingTop: topPadding + spacing.lg,
-            paddingBottom: isWeb ? 34 + 84 : 100,
+            paddingBottom: isWeb ? 34 + 84 : 60 + insets.bottom + spacing.xxl,
           },
         ]}
         showsVerticalScrollIndicator={false}
