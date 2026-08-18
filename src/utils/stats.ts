@@ -1,27 +1,34 @@
 /**
- * Computes the current consecutive streak based on a list of logs. Only
- * reads `.date` (YYYY-MM-DD), so it works for both the MMKV `DailyLog[]`
- * shape and SQLite `daily_logs` rows without a cast.
+ * Computes streak from logs. `today` is passed explicitly to enforce dependency tracking in memoized callers.
  */
-export function computeStreak(logs: { date: string }[]): number {
-  if (logs.length === 0) return 0;
+export function computeStreak(
+  logs: { date: string }[],
+  today: string,
+): number {
+  if (!today || !logs || logs.length === 0) return 0;
 
-  const uniqueDates = Array.from(new Set(logs.map((l) => l.date)))
+  const validDates = logs
+    .map((l) => l?.date)
+    .filter((d): d is string => typeof d === "string" && d.includes("-"));
+
+  if (validDates.length === 0) return 0;
+
+  const uniqueDates = Array.from(new Set(validDates))
     .map((d) => {
       const [year, month, day] = d.split("-").map(Number);
       return new Date(year, month - 1, day);
     })
     .sort((a, b) => b.getTime() - a.getTime());
 
-  const today = new Date();
-  const todayMidnight = new Date(
-    today.getFullYear(),
-    today.getMonth(),
-    today.getDate(),
-  );
+  const [ty, tm, td] = today.split("-").map(Number);
+  if (isNaN(ty) || isNaN(tm) || isNaN(td)) return 0;
+
+  const todayMidnight = new Date(ty, tm - 1, td);
 
   const diffDaysFor = (date: Date) =>
-    Math.round((todayMidnight.getTime() - date.getTime()) / (1000 * 60 * 60 * 24));
+    Math.round(
+      (todayMidnight.getTime() - date.getTime()) / (1000 * 60 * 60 * 24),
+    );
 
   const mostRecentDiff = diffDaysFor(uniqueDates[0]);
 
