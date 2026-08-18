@@ -40,13 +40,16 @@ export function useDailyLogs() {
       .map((n) => n.niyyahId);
   };
 
-  const streak = useMemo(() => computeStreak(logs), [logs]);
+  const streak = useMemo(() => computeStreak(logs, today), [logs, today]);
 
-  const getTodayAjrMultiplier = () => {
-    const acts = todayLogs.length;
+  const getTodayAjrMultiplier = (enabledActivityIds: Set<string>) => {
+    const eligibleLogs = todayLogs.filter((log) =>
+      enabledActivityIds.has(log.activityId),
+    );
+    const acts = eligibleLogs.length;
     if (acts === 0) return { acts: 0, avgNiyyahs: 0, total: 0 };
 
-    const totalNiyyahs = todayLogs.reduce((sum, log) => {
+    const totalNiyyahs = eligibleLogs.reduce((sum, log) => {
       const count = niyyahRows.filter((n) => n.dailyLogId === log.id).length;
       return sum + count + 1; // +1 for the core intention itself
     }, 0);
@@ -71,7 +74,7 @@ export async function getFreshDailyLogState() {
   const logs = await db.select().from(dailyLogs);
   const today = getTodayString();
   return {
-    streak: computeStreak(logs),
+    streak: computeStreak(logs, today),
     completedSomethingToday: logs.some((l) => l.date === today),
   };
 }
