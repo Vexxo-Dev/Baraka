@@ -15,8 +15,11 @@ interface PreferencesSectionProps {
   themePreference: "light" | "auto" | "dark";
   notificationsActive: boolean;
   notificationsToggling: boolean;
+  streakNotificationsActive: boolean;
+  streakNotificationsToggling: boolean;
   formattedReminderTime: string;
   onNotificationToggle: (v: boolean) => void;
+  onStreakNotificationToggle: (v: boolean) => void;
   onTimePickerOpen: () => void;
   onLanguageOpen: () => void;
   onThemeChange: (mode: "light" | "auto" | "dark") => void;
@@ -28,8 +31,11 @@ export const PreferencesSection = React.memo(
     themePreference,
     notificationsActive,
     notificationsToggling,
+    streakNotificationsActive,
+    streakNotificationsToggling,
     formattedReminderTime,
     onNotificationToggle,
+    onStreakNotificationToggle,
     onTimePickerOpen,
     onLanguageOpen,
     onThemeChange,
@@ -146,6 +152,26 @@ export const PreferencesSection = React.memo(
               />
             </>
           )}
+
+          <View style={[styles.divider, { backgroundColor: C.borderLight }]} />
+
+          <SettingRow
+            icon='zap'
+            iconColor='#D4AF37'
+            iconBg='#D4AF3720'
+            label={t("settings.streakNotifications")}
+            desc={t("settings.streakNotificationsDesc")}
+            right={
+              <Switch
+                value={streakNotificationsActive}
+                onValueChange={onStreakNotificationToggle}
+                disabled={streakNotificationsToggling}
+                trackColor={{ false: C.border, true: C.tint + "80" }}
+                thumbColor={streakNotificationsActive ? C.tint : C.textMuted}
+                ios_backgroundColor={C.border}
+              />
+            }
+          />
 
           <View style={[styles.divider, { backgroundColor: C.borderLight }]} />
 

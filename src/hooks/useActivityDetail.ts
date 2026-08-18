@@ -98,7 +98,7 @@ export function useActivityDetail(id: string) {
     getFreshDailyLogState()
       .then(({ streak, completedSomethingToday }) =>
         evaluateStreakRisk({
-          notificationsEnabled: settings.notificationsEnabled,
+          streakNotificationsEnabled: settings.streakNotificationsEnabled,
           streakCount: streak,
           completedSomethingToday,
           t,
@@ -110,7 +110,7 @@ export function useActivityDetail(id: string) {
           extra: { phase: "refreshStreakRisk" },
         }),
       );
-  }, [settings.notificationsEnabled, t]);
+  }, [settings.streakNotificationsEnabled, t]);
 
   const handleSaveAndRenew = useCallback(async () => {
     if (!activity) return;

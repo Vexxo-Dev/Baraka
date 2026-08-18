@@ -138,7 +138,7 @@ function App() {
       getFreshDailyLogState()
         .then(({ streak, completedSomethingToday }) =>
           evaluateStreakRisk({
-            notificationsEnabled: settings.notificationsEnabled,
+            streakNotificationsEnabled: settings.streakNotificationsEnabled,
             streakCount: streak,
             completedSomethingToday,
             t,
@@ -158,6 +158,7 @@ function App() {
     seedDone,
     settings.reminderTime,
     settings.notificationsEnabled,
+    settings.streakNotificationsEnabled,
     localize,
     t,
   ]);
@@ -174,6 +175,7 @@ function App() {
       Sentry.setContext("app_config", {
         onboardingComplete: settings.onboardingComplete,
         notificationsEnabled: settings.notificationsEnabled,
+        streakNotificationsEnabled: settings.streakNotificationsEnabled,
         notificationsStatus: settings.notificationsStatus,
         reminderTime: settings.reminderTime,
       });

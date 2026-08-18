@@ -71,6 +71,7 @@ export type AppSettings = {
   darkMode: AppThemeMode;
   notificationsStatus: NotificationPermissionStatus;
   notificationsEnabled: boolean;
+  streakNotificationsEnabled: boolean;
   reminderTime: string;
   onboardingComplete: boolean;
   profile: UserProfile;

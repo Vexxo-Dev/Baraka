@@ -241,19 +241,19 @@ export async function cancelStreakRiskNotification() {
  */
 
 interface EvaluateStreakRiskParams {
-  notificationsEnabled: boolean;
+  streakNotificationsEnabled: boolean;
   streakCount: number;
   completedSomethingToday: boolean;
   t: (key: string, options?: Record<string, unknown>) => string;
 }
 
 export async function evaluateStreakRisk({
-  notificationsEnabled,
+  streakNotificationsEnabled,
   streakCount,
   completedSomethingToday,
   t,
 }: EvaluateStreakRiskParams) {
-  if (!notificationsEnabled || streakCount < 1) {
+  if (!streakNotificationsEnabled || streakCount < 1) {
     await cancelStreakRiskNotification();
     return;
   }

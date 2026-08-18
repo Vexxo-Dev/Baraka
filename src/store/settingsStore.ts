@@ -7,7 +7,8 @@ import type { AppSettings } from "@types";
 const DEFAULT_SETTINGS: AppSettings = {
   darkMode: "auto",
   notificationsStatus: "undetermined",
-  notificationsEnabled: true,
+  notificationsEnabled: false,
+  streakNotificationsEnabled: false,
   reminderTime: "08:00",
   onboardingComplete: false,
   profile: {

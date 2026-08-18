@@ -49,6 +49,8 @@ export function useSettings() {
   const [pendingNotifications, setPendingNotifications] = useState<
     boolean | null
   >(null);
+  const [pendingStreakNotifications, setPendingStreakNotifications] =
+    useState<boolean | null>(null);
 
   const notificationsActive = useMemo(
     () =>
@@ -58,6 +60,18 @@ export function useSettings() {
     [
       pendingNotifications,
       settings.notificationsEnabled,
+      settings.notificationsStatus,
+    ],
+  );
+
+  const streakNotificationsActive = useMemo(
+    () =>
+      pendingStreakNotifications ??
+      (settings.streakNotificationsEnabled &&
+        settings.notificationsStatus === "granted"),
+    [
+      pendingStreakNotifications,
+      settings.streakNotificationsEnabled,
       settings.notificationsStatus,
     ],
   );
@@ -105,15 +119,17 @@ export function useSettings() {
               settings.reminderTime || "08:00",
               localize,
             );
-            const completedSomethingToday = dailyLogs.some(
-              (l) => l.date === getTodayString(),
-            );
-            await evaluateStreakRisk({
-              notificationsEnabled: true,
-              streakCount: streak,
-              completedSomethingToday,
-              t,
-            });
+            if (settings.streakNotificationsEnabled) {
+              const completedSomethingToday = dailyLogs.some(
+                (l) => l.date === getTodayString(),
+              );
+              await evaluateStreakRisk({
+                streakNotificationsEnabled: true,
+                streakCount: streak,
+                completedSomethingToday,
+                t,
+              });
+            }
           } else {
             Alert.alert(
               t("settings.notifPermissionTitle"),
@@ -130,7 +146,6 @@ export function useSettings() {
         } else {
           updateSettings({ notificationsEnabled: false });
           await cancelDailyNotifications();
-          await cancelStreakRiskNotification();
         }
       } finally {
         setPendingNotifications(null);
@@ -139,12 +154,61 @@ export function useSettings() {
     [
       pendingNotifications,
       settings.reminderTime,
+      settings.streakNotificationsEnabled,
       updateSettings,
       localize,
       t,
       dailyLogs,
       streak,
     ],
+  );
+
+  const handleStreakNotificationToggle = useCallback(
+    async (v: boolean) => {
+      if (pendingStreakNotifications !== null) return; // already mid-toggle
+
+      setPendingStreakNotifications(v);
+      try {
+        if (v) {
+          const status = await registerForPushNotificationsAsync();
+          updateSettings({
+            notificationsStatus: status,
+            streakNotificationsEnabled: status === "granted",
+          });
+
+          if (status === "granted") {
+            Haptic.success();
+            const completedSomethingToday = dailyLogs.some(
+              (l) => l.date === getTodayString(),
+            );
+            await evaluateStreakRisk({
+              streakNotificationsEnabled: true,
+              streakCount: streak,
+              completedSomethingToday,
+              t,
+            });
+          } else {
+            Alert.alert(
+              t("settings.notifPermissionTitle"),
+              t("settings.streakNotifPermissionMessage"),
+              [
+                { text: t("common.cancel"), style: "cancel" },
+                {
+                  text: t("settings.openSettings"),
+                  onPress: () => Linking.openSettings(),
+                },
+              ],
+            );
+          }
+        } else {
+          updateSettings({ streakNotificationsEnabled: false });
+          await cancelStreakRiskNotification();
+        }
+      } finally {
+        setPendingStreakNotifications(null);
+      }
+    },
+    [pendingStreakNotifications, updateSettings, t, dailyLogs, streak],
   );
 
   const handleTimeChange = useCallback(
@@ -171,6 +235,8 @@ export function useSettings() {
 
         if (notificationsActive) {
           await cancelDailyNotifications();
+        }
+        if (streakNotificationsActive) {
           await cancelStreakRiskNotification();
         }
 
@@ -179,7 +245,7 @@ export function useSettings() {
         console.error("Failed to change language:", error);
       }
     },
-    [lang, notificationsActive, changeLanguage],
+    [lang, notificationsActive, streakNotificationsActive, changeLanguage],
   );
 
   const handleExportData = useCallback(async () => {
@@ -216,11 +282,14 @@ export function useSettings() {
     updateSettings,
     notificationsActive,
     notificationsToggling: pendingNotifications !== null,
+    streakNotificationsActive,
+    streakNotificationsToggling: pendingStreakNotifications !== null,
     formattedReminderTime,
     toastMessage,
     animatedToastStyle,
     handleProfileToggle,
     handleNotificationToggle,
+    handleStreakNotificationToggle,
     handleTimeChange,
     handleLanguageSelect,
     handleExportData,
