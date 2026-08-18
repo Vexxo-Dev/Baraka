@@ -2,7 +2,6 @@ import React from "react";
 import {
   View,
   StyleSheet,
-  Platform,
 } from "react-native";
 import { KeyboardAwareScrollViewCompat } from "@components/KeyboardAwareScrollViewCompat";
 import { AppText } from "@components/UI/AppText";
@@ -62,8 +61,7 @@ export const ActivityViewStep = React.memo(
     const { t } = useTranslation();
     const { colors: C, isDark } = useTheme();
     const insets = useSafeAreaInsets();
-    const isWeb = Platform.OS === "web";
-    const topPadding = isWeb ? 67 : insets.top;
+    const topPadding = insets.top;
 
     return (
       <KeyboardAwareScrollViewCompat
@@ -71,7 +69,7 @@ export const ActivityViewStep = React.memo(
           styles.scrollContent,
           {
             paddingTop: topPadding + spacing.sm,
-            paddingBottom: isWeb ? 34 + 40 : 60,
+            paddingBottom: insets.bottom + spacing.xl,
           },
         ]}
         showsVerticalScrollIndicator={false}

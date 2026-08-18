@@ -1,5 +1,5 @@
 import React from "react";
-import { View, StyleSheet, Platform } from "react-native";
+import { View, StyleSheet } from "react-native";
 import { AppText } from "@components/UI/AppText";
 import { AppTextInput } from "@components/UI/AppTextInput";
 import { AppButton } from "@components/UI/AppButton";
@@ -44,8 +44,7 @@ export const ActivityReflectStep = React.memo(
     const { t } = useTranslation();
     const { colors: C, isDark } = useTheme();
     const insets = useSafeAreaInsets();
-    const isWeb = Platform.OS === "web";
-    const topPadding = isWeb ? 67 : insets.top;
+    const topPadding = insets.top;
 
     const selectedTexts = allAdvanced
       .filter((n) => localSelected.includes(n.id))
@@ -55,7 +54,7 @@ export const ActivityReflectStep = React.memo(
       <KeyboardAwareScrollViewCompat
         contentContainerStyle={[
           styles.scrollContent,
-          { paddingTop: topPadding + spacing.sm, paddingBottom: isWeb ? 34 + 40 : 60 },
+          { paddingTop: topPadding + spacing.sm, paddingBottom: insets.bottom + spacing.xl },
         ]}
         showsVerticalScrollIndicator={false}
         keyboardShouldPersistTaps="handled"

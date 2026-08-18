@@ -7,14 +7,16 @@ import { useTheme } from "@context/ThemeContext";
 import { spacing } from "@constants/spacing";
 import { radius } from "@constants/radius";
 
+import { useSafeAreaInsets } from "react-native-safe-area-context";
+
 interface SettingsToastProps {
   message: string;
   animatedStyle: any;
-  isWeb: boolean;
 }
 
-export function SettingsToast({ message, animatedStyle, isWeb }: SettingsToastProps) {
+export function SettingsToast({ message, animatedStyle }: SettingsToastProps) {
   const { colors: C } = useTheme();
+  const insets = useSafeAreaInsets();
 
   if (message === "") return null;
 
@@ -26,7 +28,7 @@ export function SettingsToast({ message, animatedStyle, isWeb }: SettingsToastPr
           backgroundColor: C.backgroundCard,
           borderColor: C.border,
           borderWidth: 1,
-          bottom: isWeb ? 34 + 84 : 100,
+          bottom: 60 + insets.bottom + spacing.md,
         },
         animatedStyle,
       ]}

@@ -18,7 +18,7 @@ import { getActivityBilingualName } from "@hooks/db/useActivities";
 import type { DbJournalEntry } from "@hooks/db/useJournal";
 import { useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
-import { Platform, StyleSheet, View } from "react-native";
+import { StyleSheet, View } from "react-native";
 import Animated, { FadeInDown } from "react-native-reanimated";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { KeyboardAwareScrollViewCompat } from "@components/KeyboardAwareScrollViewCompat";
@@ -29,8 +29,7 @@ export default function JournalScreen() {
   const { t } = useTranslation();
   const { colors: C } = useTheme();
   const insets = useSafeAreaInsets();
-  const isWeb = Platform.OS === "web";
-  const topPadding = isWeb ? 67 : insets.top;
+  const topPadding = insets.top;
 
   const {
     journalEntries,
@@ -125,7 +124,7 @@ export default function JournalScreen() {
           styles.scrollContent,
           {
             paddingTop: topPadding + spacing.lg,
-            paddingBottom: isWeb ? 34 + 84 : 60 + insets.bottom + spacing.xxl,
+            paddingBottom: 60 + insets.bottom + spacing.xxl,
           },
         ]}
         showsVerticalScrollIndicator={false}

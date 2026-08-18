@@ -10,7 +10,7 @@ import { Feather } from "@expo/vector-icons";
 import { router } from "expo-router";
 import { useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
-import { Platform, StyleSheet, View } from "react-native";
+import { StyleSheet, View } from "react-native";
 import { KeyboardAwareScrollViewCompat } from "@components/KeyboardAwareScrollViewCompat";
 import Animated, { FadeInDown } from "react-native-reanimated";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
@@ -20,7 +20,6 @@ export default function LearnScreen() {
   const { t } = useTranslation();
   const { colors: C } = useTheme();
   const insets = useSafeAreaInsets();
-  const isWeb = Platform.OS === "web";
 
   const [search, setSearch] = useState("");
   const [activeCategory, setActiveCategory] = useState("All");
@@ -42,14 +41,14 @@ export default function LearnScreen() {
     });
   }, [entries, search, activeCategory]);
 
-  const topPadding = isWeb ? 67 : insets.top;
+  const topPadding = insets.top;
 
   return (
     <View style={[styles.container, { backgroundColor: C.background }]}>
       <KeyboardAwareScrollViewCompat
         contentContainerStyle={[
           styles.scrollContent,
-          { paddingTop: topPadding + spacing.lg, paddingBottom: isWeb ? 34 + 84 : 60 + insets.bottom + spacing.xxl },
+          { paddingTop: topPadding + spacing.lg, paddingBottom: 60 + insets.bottom + spacing.xxl },
         ]}
         showsVerticalScrollIndicator={false}
         keyboardShouldPersistTaps='handled'

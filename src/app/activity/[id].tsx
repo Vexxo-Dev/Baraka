@@ -1,5 +1,5 @@
 
-import { View, StyleSheet, Platform } from "react-native";
+import { View, StyleSheet } from "react-native";
 import { useLocalSearchParams } from "expo-router";
 import { useTheme } from "@context/ThemeContext";
 import { useActivityDetail } from "@hooks/useActivityDetail";
@@ -27,7 +27,6 @@ export default function ActivityDetailScreen() {
       <SettingsToast
         message={state.toastMessage}
         animatedStyle={state.animatedToastStyle}
-        isWeb={Platform.OS === "web"}
       />
       {state.step === "reflect" ? (
         <ActivityReflectStep

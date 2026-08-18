@@ -1,4 +1,4 @@
-import { Platform, StyleSheet, View } from "react-native";
+import { StyleSheet, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { Skeleton } from "@components/UI/Skeleton";
 import { useTheme } from "@context/ThemeContext";
@@ -8,8 +8,7 @@ import { radius } from "@constants/radius";
 export function ActivityDetailSkeleton() {
   const { colors: C } = useTheme();
   const insets = useSafeAreaInsets();
-  const isWeb = Platform.OS === "web";
-  const topPadding = isWeb ? 67 : insets.top;
+  const topPadding = insets.top;
 
   return (
     <View

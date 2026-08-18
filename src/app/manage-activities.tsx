@@ -8,7 +8,7 @@ import { useActivityActions } from "@hooks/db/useActivityActions";
 import { Haptic } from "@utils/haptics";
 import { useState, useMemo, useCallback } from "react";
 import { useTranslation } from "react-i18next";
-import { Platform, StyleSheet, View } from "react-native";
+import { StyleSheet, View } from "react-native";
 import { KeyboardAwareScrollViewCompat } from "@components/KeyboardAwareScrollViewCompat";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { router } from "expo-router";
@@ -23,7 +23,6 @@ export default function ManageActivitiesScreen() {
   const { t } = useTranslation();
   const { colors: C } = useTheme();
   const insets = useSafeAreaInsets();
-  const isWeb = Platform.OS === "web";
 
   const { activities } = useAllActivities();
   const { toggleActivity } = useActivityActions();
@@ -47,14 +46,14 @@ export default function ManageActivitiesScreen() {
     [toggleActivity],
   );
 
-  const topPadding = isWeb ? 67 : insets.top;
+  const topPadding = insets.top;
 
   return (
     <View style={[styles.container, { backgroundColor: C.background }]}>
       <KeyboardAwareScrollViewCompat
         contentContainerStyle={[
           styles.scrollContent,
-          { paddingTop: topPadding + spacing.lg, paddingBottom: isWeb ? 34 + 84 : 100 },
+          { paddingTop: topPadding + spacing.lg, paddingBottom: insets.bottom + spacing.xxl },
         ]}
         showsVerticalScrollIndicator={false}
         keyboardShouldPersistTaps="handled"

@@ -22,7 +22,7 @@ import { parseReminderTime } from "@utils/parseReminderTime";
 import { router } from "expo-router";
 import { useCallback, useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
-import { Platform, StyleSheet, View } from "react-native";
+import { StyleSheet, View } from "react-native";
 import { KeyboardAwareScrollViewCompat } from "@components/KeyboardAwareScrollViewCompat";
 import Animated, {
   FadeInDown,
@@ -36,7 +36,6 @@ export default function TodayScreen() {
   const { t } = useTranslation();
   const { colors: C, isDark } = useTheme();
   const insets = useSafeAreaInsets();
-  const isWeb = Platform.OS === "web";
 
   const { activities: rawEnabledActivities, isLoading } =
     useEnabledActivities();
@@ -124,7 +123,7 @@ export default function TodayScreen() {
     router.push({ pathname: "/activity/[id]", params: { id: activity.id } });
   }, []);
 
-  const topPadding = isWeb ? 67 : insets.top;
+  const topPadding = insets.top;
 
   const [categoryFilter, setCategoryFilter] = useState<string>("all");
   const availableCategories = [
@@ -148,7 +147,7 @@ export default function TodayScreen() {
           styles.scrollContent,
           {
             paddingTop: topPadding + spacing.lg,
-            paddingBottom: isWeb ? 34 + 84 : 60 + insets.bottom + spacing.xxl,
+            paddingBottom: 60 + insets.bottom + spacing.xxl,
           },
         ]}
         showsVerticalScrollIndicator={false}

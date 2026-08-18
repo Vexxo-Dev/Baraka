@@ -2,7 +2,6 @@ import { Feather } from "@expo/vector-icons";
 import { LinearGradient } from "expo-linear-gradient";
 import { useTranslation } from "react-i18next";
 import {
-  Platform,
   StyleSheet,
   View,
 } from "react-native";
@@ -28,7 +27,7 @@ export default function EducationDetail({
   const { t } = useTranslation();
   const { colors: C, isDark } = useTheme();
   const insets = useSafeAreaInsets();
-  const isWeb = Platform.OS === "web";
+
 
   return (
     <View style={[styles.detailContainer, { backgroundColor: C.background }]}>
@@ -36,8 +35,8 @@ export default function EducationDetail({
         contentContainerStyle={[
           styles.detailContent,
           {
-            paddingTop: (isWeb ? 67 : insets.top) + spacing.lg,
-            paddingBottom: isWeb ? 34 : insets.bottom + spacing.xxl,
+            paddingTop: insets.top + spacing.lg,
+            paddingBottom: insets.bottom + spacing.xxl,
           },
         ]}
         showsVerticalScrollIndicator={false}

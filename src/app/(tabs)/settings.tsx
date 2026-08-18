@@ -22,7 +22,7 @@ export default function SettingsScreen() {
   const { t } = useTranslation();
   const { colors: C } = useTheme();
   const insets = useSafeAreaInsets();
-  const isWeb = Platform.OS === "web";
+
 
   const langSheetRef = useRef<BottomSheetModal>(null);
   const clearDataSheetRef = useRef<BottomSheetModal>(null);
@@ -73,15 +73,14 @@ export default function SettingsScreen() {
       <SettingsToast
         message={toastMessage}
         animatedStyle={animatedToastStyle}
-        isWeb={isWeb}
       />
 
       <KeyboardAwareScrollViewCompat
         contentContainerStyle={[
           styles.scrollContent,
           {
-            paddingTop: (isWeb ? 67 : insets.top) + spacing.lg,
-            paddingBottom: isWeb ? 34 + 84 : 60 + insets.bottom + spacing.xxl,
+            paddingTop: insets.top + spacing.lg,
+            paddingBottom: 60 + insets.bottom + spacing.xxl,
           },
         ]}
         showsVerticalScrollIndicator={false}

@@ -15,7 +15,6 @@ export default function TabLayout() {
   const insets = useSafeAreaInsets();
   const { language } = useLanguage();
   const isIOS = Platform.OS === "ios";
-  const isWeb = Platform.OS === "web";
 
   return (
     <Tabs
@@ -38,10 +37,10 @@ export default function TabLayout() {
         tabBarStyle: {
           position: "absolute",
           backgroundColor: isIOS ? "transparent" : C.backgroundCard,
-          borderTopWidth: isWeb ? 1 : 0,
+          borderTopWidth: 0,
           borderTopColor: C.border,
           elevation: 0,
-          height: isWeb ? 84 : 60 + insets.bottom,
+          height: 60 + insets.bottom,
         },
         tabBarItemStyle: {
           justifyContent: 'center',
