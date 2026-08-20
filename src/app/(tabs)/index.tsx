@@ -20,7 +20,7 @@ import { useSettingsStore } from "@store";
 import { Haptic } from "@utils/haptics";
 import { parseReminderTime } from "@utils/parseReminderTime";
 import { router } from "expo-router";
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { StyleSheet, View } from "react-native";
 import { KeyboardAwareScrollViewCompat } from "@components/KeyboardAwareScrollViewCompat";
@@ -126,9 +126,10 @@ export default function TodayScreen() {
   const topPadding = insets.top;
 
   const [categoryFilter, setCategoryFilter] = useState<string>("all");
-  const availableCategories = [
-    ...new Set(enabledActivities.map((a) => a.category)),
-  ];
+  const availableCategories = useMemo(
+    () => [...new Set(enabledActivities.map((a) => a.category))],
+    [enabledActivities],
+  );
   const filteredActivities = enabledActivities.filter(
     (activity) =>
       categoryFilter === "all" || activity.category === categoryFilter,

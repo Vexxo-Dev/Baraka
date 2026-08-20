@@ -105,9 +105,28 @@ async function seedContent() {
     await tx.delete(niyyahProfileTags);
     await tx.delete(niyyahOptions);
     await tx.delete(learnContent);
-    await tx.delete(activities);
 
-    await tx.insert(activities).values(activitiesSeed.map(mapActivity));
+    for (const row of activitiesSeed) {
+      const mapped = mapActivity(row);
+      await tx
+        .insert(activities)
+        .values(mapped)
+        .onConflictDoUpdate({
+          target: activities.id,
+          set: {
+            nameEn: mapped.nameEn,
+            nameAr: mapped.nameAr,
+            category: mapped.category,
+            niyyahTextEn: mapped.niyyahTextEn,
+            niyyahTextAr: mapped.niyyahTextAr,
+            hadithRefEn: mapped.hadithRefEn,
+            hadithRefAr: mapped.hadithRefAr,
+            defaultTime: mapped.defaultTime,
+            sortOrder: mapped.sortOrder,
+          },
+        });
+    }
+
     await tx
       .insert(niyyahOptions)
       .values(niyyahOptionsSeed.map(mapNiyyahOption));

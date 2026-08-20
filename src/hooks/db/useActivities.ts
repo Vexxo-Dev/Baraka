@@ -1,9 +1,9 @@
 import { useMemo } from "react";
 import { eq } from "drizzle-orm";
-import { useLiveQuery } from "drizzle-orm/expo-sqlite";
 import { useLanguage } from "@i18n";
 import { db } from "@/db/db";
 import { activities, userActivityPrefs, customActivities } from "@/db/schema";
+import { useSafeLiveQuery } from "./useSafeLiveQuery";
 
 export type DbUserActivity = {
   id: string;
@@ -44,17 +44,17 @@ function useBuiltinActivities(): ActivitiesState {
         .from(activities),
     [language],
   );
-  const { data: activitiesData, updatedAt: activitiesUpdatedAt } =
-    useLiveQuery(activitiesQuery, [language]);
+  const { data: activitiesData, isLoading: activitiesLoading } =
+    useSafeLiveQuery(activitiesQuery, [language], "activities");
 
   const prefsQuery = useMemo(() => db.select().from(userActivityPrefs), []);
-  const { data: prefsData, updatedAt: prefsUpdatedAt } = useLiveQuery(
+  const { data: prefsData, isLoading: prefsLoading } = useSafeLiveQuery(
     prefsQuery,
     [],
+    "user_activity_prefs",
   );
 
-  const isLoading =
-    activitiesUpdatedAt === undefined || prefsUpdatedAt === undefined;
+  const isLoading = activitiesLoading || prefsLoading;
 
   const activityList = useMemo(() => {
     const prefsById = new Map(
@@ -101,7 +101,7 @@ function useCustomActivitiesList(): ActivitiesState {
     [language],
   );
 
-  const { data, updatedAt } = useLiveQuery(query, [language]);
+  const { data, isLoading } = useSafeLiveQuery(query, [language], "custom_activities");
 
   const activityList = useMemo(
     () =>
@@ -120,7 +120,7 @@ function useCustomActivitiesList(): ActivitiesState {
     [data],
   );
 
-  return { activities: activityList, isLoading: updatedAt === undefined };
+  return { activities: activityList, isLoading };
 }
 
 export function useAllActivities(): ActivitiesState {

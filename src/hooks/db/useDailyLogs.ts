@@ -1,25 +1,31 @@
 import { useMemo } from "react";
-import { useLiveQuery } from "drizzle-orm/expo-sqlite";
 import { db } from "@/db/db";
 import { dailyLogs, dailyLogNiyyahs } from "@/db/schema";
 import { computeStreak } from "@utils/stats";
 import { getTodayString } from "@utils/date";
 import { useToday } from "@hooks/useToday";
+import { useSafeLiveQuery } from "./useSafeLiveQuery";
 
 export function useDailyLogs() {
-  const { data: allLogs, updatedAt: logsUpdatedAt } = useLiveQuery(
-    db.select().from(dailyLogs),
+  const logsQuery = useMemo(() => db.select().from(dailyLogs), []);
+  const { data: allLogs, isLoading: logsLoading } = useSafeLiveQuery(
+    logsQuery,
+    [],
+    "daily_logs",
   );
-  const { data: allNiyyahs, updatedAt: niyyahsUpdatedAt } = useLiveQuery(
-    db.select().from(dailyLogNiyyahs),
+
+  const niyyahsQuery = useMemo(() => db.select().from(dailyLogNiyyahs), []);
+  const { data: allNiyyahs, isLoading: niyyahsLoading } = useSafeLiveQuery(
+    niyyahsQuery,
+    [],
+    "daily_log_niyyahs",
   );
 
   const logs = allLogs ?? [];
   const niyyahRows = allNiyyahs ?? [];
   const today = useToday();
 
-  const isLoading =
-    logsUpdatedAt === undefined || niyyahsUpdatedAt === undefined;
+  const isLoading = logsLoading || niyyahsLoading;
 
   const todayLogs = useMemo(
     () => logs.filter((l) => l.date === today),

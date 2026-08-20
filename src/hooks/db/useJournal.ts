@@ -1,9 +1,9 @@
 import { useMemo } from "react";
 import { desc } from "drizzle-orm";
-import { useLiveQuery } from "drizzle-orm/expo-sqlite";
 import { useLanguage } from "@i18n";
 import { db } from "@/db/db";
 import { journalEntries } from "@/db/schema";
+import { useSafeLiveQuery } from "./useSafeLiveQuery";
 
 export type DbJournalEntry = {
   id: string;
@@ -43,7 +43,7 @@ export function useJournalEntries(): JournalState {
     [language],
   );
 
-  const { data, updatedAt } = useLiveQuery(query, [language]);
+  const { data, isLoading } = useSafeLiveQuery(query, [language], "journal_entries");
 
   const entries = useMemo(
     () =>
@@ -54,5 +54,5 @@ export function useJournalEntries(): JournalState {
     [data],
   );
 
-  return { entries, isLoading: updatedAt === undefined };
+  return { entries, isLoading };
 }

@@ -1,6 +1,6 @@
 import i18n, { needsRTLReload } from "@i18n";
 import * as Sentry from "@sentry/react-native";
-import { Stack } from "expo-router";
+
 import * as SplashScreen from "expo-splash-screen";
 import { useEffect, useState } from "react";
 import { I18nextProvider } from "react-i18next";
@@ -12,6 +12,7 @@ import { ThemeProvider } from "@/context/ThemeContext";
 import { BottomSheetModalProvider } from "@gorhom/bottom-sheet";
 import { useNotifications } from "@/hooks/useNotifications";
 import { ErrorBoundary } from "@components/ErrorBoundary";
+import { ErrorFallbackUI } from "@components/UI/ErrorFallbackUI";
 import { useSettingsStore } from "@store/settingsStore";
 import { getFreshDailyLogState } from "@hooks/db/useDailyLogs";
 import {
@@ -27,6 +28,7 @@ import { useMigrations } from "drizzle-orm/expo-sqlite/migrator";
 import { db } from "@/db/db";
 import { migrations } from "@/db/migrations";
 import { seedIfNeeded } from "@/db/seed";
+import { RootNavigator } from "@/navigation/RootNavigator";
 
 SplashScreen.preventAutoHideAsync();
 SplashScreen.setOptions({
@@ -58,28 +60,6 @@ Sentry.init({
   spotlight: __DEV__,
 });
 
-function RootLayoutNav() {
-  const onboardingComplete = useSettingsStore(
-    (s) => s.settings.onboardingComplete,
-  );
-
-  return (
-    <Stack screenOptions={{ headerShown: false }}>
-      <Stack.Protected guard={onboardingComplete}>
-        <Stack.Screen name='(tabs)' options={{ animation: "none" }} />
-        <Stack.Screen
-          name='activity/[id]'
-          options={{ presentation: "modal" }}
-        />
-        <Stack.Screen name='learn/[id]' options={{ presentation: "card" }} />
-      </Stack.Protected>
-
-      <Stack.Protected guard={!onboardingComplete}>
-        <Stack.Screen name='onboarding' options={{ gestureEnabled: false }} />
-      </Stack.Protected>
-    </Stack>
-  );
-}
 
 function App() {
   const [i18nReady, setI18nReady] = useState(false);
@@ -126,8 +106,12 @@ function App() {
     };
   }, [migrationsSuccess]);
 
+  // Wait for i18n, settings, migrations, and seeding to finish.
+  // This prevents screens from firing queries before the DB tables exist.
+  const appReady = i18nReady && !isLoading && migrationsSuccess && seedDone;
+
   useEffect(() => {
-    if (i18nReady && !isLoading && migrationsSuccess && seedDone) {
+    if (appReady) {
       SplashScreen.hideAsync();
       recheckAndRescheduleIfNeeded(
         settings.reminderTime || "08:00",
@@ -152,10 +136,7 @@ function App() {
         );
     }
   }, [
-    i18nReady,
-    isLoading,
-    migrationsSuccess,
-    seedDone,
+    appReady,
     settings.reminderTime,
     settings.notificationsEnabled,
     settings.streakNotificationsEnabled,
@@ -164,7 +145,7 @@ function App() {
   ]);
 
   useEffect(() => {
-    if (i18nReady && !isLoading && migrationsSuccess && seedDone) {
+    if (appReady) {
       Sentry.setUser({
         id: getAnonymousUserId(),
       });
@@ -180,11 +161,31 @@ function App() {
         reminderTime: settings.reminderTime,
       });
     }
-  }, [i18nReady, isLoading, migrationsSuccess, seedDone]);
+  }, [appReady]);
 
-  if (migrationsError) {
-    Sentry.captureException(migrationsError);
-  }
+  useEffect(() => {
+    if (!migrationsError) return;
+    Sentry.captureException(migrationsError, {
+      tags: { feature: "db" },
+      extra: { phase: "bootMigrations" },
+    });
+    // DB is unusable. Drop the splash screen immediately to show the error UI.
+    SplashScreen.hideAsync();
+  }, [migrationsError]);
+
+  // Boot watchdog: If stuck on splash for 10s, report the exact loading flags to Sentry.
+  useEffect(() => {
+    if (appReady) return;
+    const timeoutId = setTimeout(() => {
+      if (appReady) return;
+      Sentry.captureMessage("App boot watchdog timed out", {
+        level: "warning",
+        tags: { feature: "boot" },
+        extra: { i18nReady, isLoading, migrationsSuccess, seedDone },
+      });
+    }, 10000);
+    return () => clearTimeout(timeoutId);
+  }, [appReady, i18nReady, isLoading, migrationsSuccess, seedDone]);
 
   return (
     <GestureHandlerRootView style={{ flex: 1 }}>
@@ -194,7 +195,16 @@ function App() {
             <BottomSheetModalProvider>
               <ErrorBoundary>
                 <I18nextProvider i18n={i18n}>
-                  <RootLayoutNav />
+                  {migrationsError ? (
+                    <ErrorFallbackUI
+                      error={migrationsError}
+                      onReset={reloadApp}
+                      title={t("error.title")}
+                      subtitle={t("error.message")}
+                    />
+                  ) : appReady ? (
+                    <RootNavigator />
+                  ) : null}
                 </I18nextProvider>
               </ErrorBoundary>
             </BottomSheetModalProvider>
