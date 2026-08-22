@@ -51,11 +51,22 @@ Sentry.init({
 
   sendDefaultPii: false,
 
-  enableLogs: true,
+  // console.* forwarding - must stay dev-only. In production this would ship
+  // every unguarded console.log (journal/reflection text passes through some
+  // of them) to Sentry as log events.
+  enableLogs: __DEV__,
 
   replaysSessionSampleRate: __DEV__ ? 1.0 : 0.0,
   replaysOnErrorSampleRate: __DEV__ ? 1.0 : 0.1,
-  integrations: [Sentry.mobileReplayIntegration()],
+  // Explicit masking rather than relying on SDK defaults - this app stores
+  // private journal/reflection text, and session replay must never capture it.
+  integrations: [
+    Sentry.mobileReplayIntegration({
+      maskAllText: true,
+      maskAllImages: true,
+      maskAllVectors: true,
+    }),
+  ],
 
   spotlight: __DEV__,
 });
@@ -92,11 +103,17 @@ function App() {
   }, [i18nReady]);
 
   useEffect(() => {
-    if (!migrationsSuccess) return;
+    if (!migrationsSuccess || isLoading) return;
 
     let cancelled = false;
     seedIfNeeded()
-      .catch((err) => Sentry.captureException(err))
+      .catch(async (err) => {
+        Sentry.captureException(err, {
+          tags: { feature: "db" },
+          extra: { phase: "seedIfNeeded" },
+        });
+        await Sentry.flush();
+      })
       .finally(() => {
         if (!cancelled) setSeedDone(true);
       });
@@ -104,7 +121,7 @@ function App() {
     return () => {
       cancelled = true;
     };
-  }, [migrationsSuccess]);
+  }, [migrationsSuccess, isLoading]);
 
   // Wait for i18n, settings, migrations, and seeding to finish.
   // This prevents screens from firing queries before the DB tables exist.
