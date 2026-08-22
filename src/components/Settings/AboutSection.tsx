@@ -1,5 +1,6 @@
 import React, { useCallback } from "react";
 import { View, StyleSheet, Linking, Alert, Platform } from "react-native";
+import Constants from "expo-constants";
 import { useTranslation } from "react-i18next";
 import { useTheme } from "@context/ThemeContext";
 import { AppText } from "@components/UI/AppText";
@@ -146,7 +147,7 @@ OS: ${Platform.OS} ${Platform.Version}
           variant='body'
           style={[styles.versionText, { color: C.textMuted }]}
         >
-          {t("settings.version")}
+          {t("settings.version", { version: Constants.expoConfig?.version })}
         </AppText>
         <AppText
           weight='Regular'
