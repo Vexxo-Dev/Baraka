@@ -45,12 +45,16 @@ yarn-error.*
 
 # docs
 *.md
+!README.md
+!ARCHITECTURE.md
+!CONTRIBUTING.md
 ExcelToJson.js
 assets/images/old
 .vscode
 assets/store/*
 # Agent & Planning Docs
 .agents/
+.claude/
 *plan.md
 *-session-handoff.md
 CLAUDE.md

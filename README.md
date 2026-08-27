@@ -1,153 +1,158 @@
-# Baraka
+# Baraka (بركة)
 
-A privacy-first, offline-capable mobile app for Muslims to set and renew daily intentions (niyyah) for routine activities, elevating them into acts of worship.
+An offline-first, bilingual (English/Arabic) mobile app that helps Muslims set and renew a conscious intention (niyyah) before daily activities — prayer, eating, work, sleep — turning routine moments into acts of worship. Every intention is backed by a verified, canonical hadith reference; nothing is included on a weak or fabricated source.
 
-[![Build Status](https://img.shields.io/badge/build-passing-brightgreen.svg)]()
-[![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)]()
 [![Version](https://img.shields.io/badge/version-1.0.0-blue.svg)]()
 [![React Native](https://img.shields.io/badge/React_Native-20232A?style=flat&logo=react&logoColor=61DAFB)]()
-[![Expo](https://img.shields.io/badge/Expo-1B1F23?style=flat&logo=expo&logoColor=white)]()
-[![Zustand](https://img.shields.io/badge/Zustand-764ABC?style=flat&logo=react&logoColor=white)]()
+[![Expo](https://img.shields.io/badge/Expo_SDK_54-1B1F23?style=flat&logo=expo&logoColor=white)]()
+[![TypeScript](https://img.shields.io/badge/TypeScript-3178C6?style=flat&logo=typescript&logoColor=white)]()
+[![Drizzle ORM](https://img.shields.io/badge/Drizzle_ORM-C5F74F?style=flat&logo=drizzle&logoColor=black)]()
+[![Sentry](https://img.shields.io/badge/Sentry-362D59?style=flat&logo=sentry&logoColor=white)]()
+
+Shipped to Google Play (closed testing).
 
 ---
 
 ## Overview
 
-Many daily routines—like commuting, working, or eating—can feel mundane, but in Islamic tradition, they can be transformed into acts of worship simply by attaching a conscious, positive intention (Niyyah). Baraka solves the problem of spiritual disconnect in modern busy lives by offering a structured, interactive way to set, track, and reflect on these intentions every day.
+Many daily routines can feel mundane, but in Islamic tradition they become acts of worship through a sincere, conscious intention. Baraka gives that intention structure: role-based niyyah suggestions (parent, student, professional, homemaker), a daily renewal flow, reflection journaling, and a streak/reward system — entirely offline, fully bilingual with real RTL support, and content-audited against canonical sources rather than generic self-help copy.
 
-By leveraging role-based filtering, users are presented with tailored niyyah suggestions (e.g., specific intentions for parents, students, or professionals). Technically, Baraka is an offline-first mobile application built with React Native and Expo. It leverages Zustand for high-performance state management and features a fully custom, premium Emerald/Gold design system built with React Native Reanimated and Expo Glass Effect, ensuring a fast, tactile, and visually stunning user experience.
-
----
-
-## Screenshots / Demo
-
-<!-- Add screenshots or GIFs here (e.g., from /assets/images or a /screenshots folder) -->
+It's also a live case study in migrating a shipped, published app's entire data layer without losing a single user's history — see [ARCHITECTURE.md's Notable Engineering Problems](./ARCHITECTURE.md#notable-engineering-problems) for what that actually involved.
 
 ---
 
 ## Features
 
-- **Role-Based Niyyah Filtering:** Dynamically adapts suggested intentions based on user roles (Parent, Student, Professional, Homemaker) using a reactive Zustand store.
-- **Ajr Multiplier Dashboard:** Motivates users with a live calculation of potential spiritual reward (completed acts × average intentions per act), built with highly optimized reactive state selectors.
-- **Bilingual Interface (English/Arabic):** Full UI and content localization via `i18next` and `expo-localization`, supporting dynamic language toggling on the fly.
-- **Daily Intention Reminders:** Configurable daily push notifications with a customizable reminder time, bilingual rotating messages, contextual permission flow, and tap-to-open deep linking.
-- **Reflection Journaling:** Allows users to log post-activity reflections with activity-based filtering and multi-tag search capabilities.
-- **Offline-First & Privacy Focused:** Operates entirely on-device without any backend servers, storing all user preferences and history locally via `AsyncStorage`.
-- **Premium Tactile UX:** Uses `expo-haptics` and `react-native-reanimated` to provide micro-animations and centralized haptic feedback for a highly polished feel.
-- **Data Portability:** Allows users to export their entire intention and journaling history to an `.xlsx` format for personal safekeeping.
+- **Role-based niyyah suggestions.** Intention options tailored to parent, student, professional, and homemaker roles, so the same activity surfaces different, relevant niyyah text per role.
+- **17 daily activities** spanning prayer, eating, work, exercise, sleep, and more, each backed by a verified, canonical hadith reference.
+- **Daily renewal flow.** A deliberate "set your intention" step before each activity, with a disclaimer that niyyah lives in the heart, not the tongue.
+- **Streak tracking with an ajr (reward) multiplier**, strict by design. Missing a day resets the streak.
+- **Optional 9 PM streak-risk reminder.** If nothing's been completed by then, you're notified before the day is lost. It stays armed a day ahead so it still fires even if you don't reopen the app.
+- **A single daily reminder** at a time you choose, with a contextual permission flow, instead of per-activity notification spam.
+- **Reflection journaling** with search and filtering across past entries.
+- **Custom activities and custom niyyah options** to extend the built-in set with your own.
+- **Fully offline.** No network dependency for core functionality.
+- **Bilingual EN/AR with real RTL support**, enforced as the default experience rather than bolted on.
+
+---
+
+## Screenshots / Demo
+
+<!-- Add EN/AR screenshot pairs here — side-by-side LTR/RTL is worth more than a paragraph of description -->
+
+---
+
+## Architecture Highlights
+
+Full reasoning and the complete bug writeups live in **[ARCHITECTURE.md](./ARCHITECTURE.md)**. Short version:
+
+- **SQLite (expo-sqlite) + Drizzle ORM**, not Realm (deprecated by MongoDB in 2024) or WatermelonDB (built for sync/scale this app doesn't need) — chosen for real relational integrity (explicit foreign keys) over the static-array model it replaced.
+- **A real `useLiveQuery` gotcha**: it only subscribes to a query's `FROM` table, not anything `leftJoin`-ed in — found when activity toggles silently stopped updating the UI.
+- **Async local reads still need a loading state**: `useLiveQuery` seeds `[]` before resolving, so "loading" and "genuinely empty" look identical without an explicit signal — solved with `updatedAt`-gated skeleton loaders instead of spinners or blank screens.
+- **Arabic is the enforced default**, regardless of device locale, with full RTL layout — including a real bug where a manual RTL animation compensation clamped the first onboarding screen to invisible.
+- **A legacy-data migration bug found by self-audit**, not a bug report: journal entries and daily logs had no backfill path from the old storage, meaning upgrading users would have silently lost their history.
+- **Sentry tuned for a free-tier quota** — breadcrumbs/tags/context are free and used liberally; exception/message capture reserved for real events.
+- **Every niyyah traces to a canonical, verified hadith reference** — no weak or fabricated sources, even if it means cutting a feature.
 
 ---
 
 ## Tech Stack
 
-| Layer | Technology | Why it was chosen |
-|---|---|---|
-| **Framework** | React Native & Expo Router | Rapid cross-platform development with file-based routing and seamless native module integration. |
-| **State Management** | Zustand | Minimal boilerplate, hook-based API, and high performance without the heavy overhead of Redux. |
-| **Local Storage** | AsyncStorage (Migrating to MMKV) | Simple key-value storage for an offline-first architecture; MMKV migration planned for synchronous reads. |
-| **Localization** | i18next & react-i18next | Industry standard for handling bilingual content (English/Arabic) with robust pluralization and interpolation. |
-| **UI & Animations** | Reanimated & Expo Glass Effect | Fluid, 60fps animations on the UI thread and native blur effects to achieve a premium aesthetic. |
-| **Data Export** | xlsx | Allows robust generation of Excel files purely on the client side for user data portability. |
+| Layer | Technology |
+|---|---|
+| Framework | React Native, Expo SDK 54, Expo Router v4, TypeScript |
+| Data (content + user data) | expo-sqlite + Drizzle ORM, reactive via `useLiveQuery` |
+| Data (settings only) | Zustand + MMKV |
+| Animation | React Native Reanimated 4, RN Gesture Handler |
+| Localization | i18next / react-i18next, full RTL support |
+| Observability | Sentry (breadcrumbs, tags, context, quota-aware error capture) |
+| Notifications | expo-notifications |
+| UI | Custom design-token system (spacing/radius/typography), `AnimatedPressable`, `@gorhom/bottom-sheet`, Feather icons |
+| Testing | Jest, targeted at migrations, streak computation, notifications, date/id utilities |
+| Tooling | Bun |
 
 ---
 
-## Architecture & Key Decisions
+## Data Model
 
-> **Decision:** Offline-first architecture with local storage only  
-> **Alternatives:** Firebase, Supabase, custom Node.js backend  
-> **Reason:** Prioritizes user privacy for sensitive journaling data. Eliminates cloud infrastructure costs and ensures the app works perfectly in low-connectivity areas.
+Core tables: `categories`, `activities`, `niyyah_options`, `niyyah_profile_tags`, `niyyah_sources`, `learn_content`, `content_meta`, `user_activity_prefs`, `custom_activities`, `custom_niyyah_options`, `daily_logs`, `daily_log_niyyahs`, `journal_entries`.
 
-> **Decision:** Zustand for Global State Management  
-> **Alternatives:** Redux Toolkit, React Context API  
-> **Reason:** React Context triggered too many unnecessary re-renders for the highly dynamic "Ajr Multiplier" and role-based filtering. Zustand provided granular, selector-based reactivity with a significantly smaller learning curve and less boilerplate than Redux.
-
-> **Decision:** Expo Router (File-based routing)  
-> **Alternatives:** React Navigation (Declarative)  
-> **Reason:** Deep linking support out-of-the-box and a Next.js-like file structure that makes the `app/` directory incredibly intuitive to navigate for new engineers joining the project.
-
-> **Decision:** Custom Design System over UI Libraries  
-> **Alternatives:** NativeBase, React Native Paper, Tamagui  
-> **Reason:** The product required a very specific, premium "Emerald/Gold" aesthetic with heavy use of glassmorphism and custom haptics. A bespoke library of atomic components (`AppButton`, `AppText`) ensured 100% control over micro-animations and RTL compliance without bloating the bundle.
+Content tables (`activities`, `niyyah_options`, `learn_content`, etc.) are wiped and re-seeded on content-version bumps; user tables are never touched by seeding. `niyyah_sources` exists ahead of use — the schema already supports layering Qur'an/athar/scholar citations alongside a hadith reference, for a planned multi-source evidencing feature.
 
 ---
 
 ## Getting Started
 
 ### Prerequisites
-- Node.js (v18+)
-- Bun (or npm/yarn/pnpm)
-- Expo Go app on your physical device (or iOS Simulator / Android Emulator)
+- Node.js 18+ and Bun
+- Android Studio (emulator) or a physical device for `expo-dev-client` — this app uses native modules (SQLite, notifications) that need a custom dev client, not plain Expo Go
 
 ### Local Setup
 
-1. **Clone the repository:**
-   ```bash
-   git clone https://github.com/Ammarahmed1263/Baraka.git
-   cd Baraka
-   ```
+```bash
+git clone https://github.com/Ammarahmed1263/Baraka.git
+cd Baraka
+bun install
+bunx expo run:android   # or: bunx expo run:ios
+```
 
-2. **Install dependencies:**
-   ```bash
-   bun install
-   ```
+### Useful scripts
 
-3. **Run the Expo development server:**
-   ```bash
-   bun start
-   ```
-
-4. **View the app:**
-   Scan the QR code in your terminal using the Expo Go app on your phone, or press `i` for iOS / `a` for Android.
+```bash
+npm run typecheck   # tsc --noEmit
+npm test            # jest
+npm run db:studio   # inspect the local SQLite DB via Drizzle Studio
+bunx expo prebuild --clean   # after any native config change
+```
 
 ---
 
 ## Project Structure
 
 ```text
-Baraka/
-├── app/               # Expo Router file-based routing and screen definitions
-├── assets/            # Static assets (fonts, icons, splash screens)
-├── components/        # Reusable, atomic UI components (AppButton, AppText, etc.)
-├── constants/         # Global configuration, themes, and design tokens
-├── context/           # React Context providers (legacy or specific scopes)
-├── data/              # Static seed data (pre-filled niyyah templates, hadiths)
-├── hooks/             # Custom React hooks for shared logic
-├── i18n/              # Localization configuration and translation files
-├── lib/               # Third-party library initializations (e.g., export logic)
-├── store/             # Zustand state management slices
-├── types/             # TypeScript interfaces and global type definitions
-└── utils/             # Pure helper functions (date formatting, ID generation)
+src/
+  app/                Expo Router screens
+    (tabs)/            index, journal, learn, settings
+    activity/[id].tsx  Activity detail (top-level route, modal presentation)
+    learn/[id].tsx
+    onboarding/
+  components/          UI/ Activity/ Home/ Journal/ Learn/ Settings/ onboarding/
+  store/               settingsStore (the only remaining Zustand store)
+  db/                  db.ts, schema.ts, seed.ts, seedMappers.ts, migrations.ts
+  data/                notifications.ts, onboardingDefaults.ts, onboardingSlides.ts
+  hooks/               screen-level hooks (useActivityDetail, useFilteredJournal, ...)
+  hooks/db/            SQLite data-access hooks (useActivities, useDailyLogs, useJournal, ...)
+  constants/ lib/ context/ services/ i18n/ types/ utils/
 ```
 
 ---
 
-## API Reference
+## Roadmap
 
-*N/A — Baraka is a 100% offline-first application. All data operations occur directly against local device storage without external API dependencies.*
+What's already built is covered above in [Overview](#overview) and [Architecture Highlights](#architecture-highlights) — including the two production incidents (boot-race and legacy-migration data loss) that were root-caused and fixed post-launch, see [ARCHITECTURE.md](./ARCHITECTURE.md#notable-engineering-problems). What's ahead:
 
----
+- [ ] Per-activity reminders and prayer-time auto-detection (v2)
+- [ ] Multi-source niyyah evidencing (Qur'an/athar/scholar citations alongside hadith — data model already in place)
+- [ ] More content — additional verified activities and learn/niyyah entries
+- [ ] Bottom sheet and toggle UI polish
+- [ ] Native Android widgets
+- [ ] In-app feedback channel
+- [ ] Basic user insights (streak trends, completion history)
+- [ ] CSV/PDF export
+- [ ] Custom activity rename/delete
+- [ ] ESLint + Prettier + pre-commit enforcement
+- [ ] OTA updates via EAS Update, so JS-only fixes don't wait on a full store review
 
-## Roadmap / In Progress
-
-- [x] **Core Infrastructure:** Zustand store migration & directory restructuring.
-- [x] **Role-Based Filtering:** Dynamic niyyah options based on user profile settings.
-- [x] **Onboarding Flow:** Introductory walkthrough explaining spiritual benefits.
-- [x] **Notifications:** Daily bilingual reminders with customizable time, permission flow, and deep-link tap-to-open via `expo-notifications`.
-- [ ] **Journal Refinement:** Add swipe-to-delete, multi-tag filtering, and keyword search.
-- [ ] **Data Export:** Handle complete export to `.xlsx`, `.csv`, `.pdf`, `.json` for user records.
-- [ ] **RTL Optimization:** Icon mirroring and Arabic typography polish.
-- [ ] **UX Polish:** Implement bottom sheet modals and Skeleton loaders.
-- [ ] **Performance:** Migrate from AsyncStorage to MMKV for synchronous storage.
-- [ ] **Observability:** Integrate Sentry for crash reporting in production.
+Open gaps tracked deliberately rather than hidden: see [ARCHITECTURE.md's Open Gaps](./ARCHITECTURE.md#open-gaps).
 
 ---
 
 ## Contributing
 
-We welcome contributions from the community! Whether it's adding new Arabic translations, refining animations, or improving local performance, please feel free to open an issue or submit a Pull Request. Make sure to run `npm run typecheck` to verify TypeScript interfaces before submitting.
+Contributions are welcome via pull request — `main` is protected, so forking and opening a PR is the only way in, and everything is reviewed before merge. See [CONTRIBUTING.md](./CONTRIBUTING.md) for the workflow.
 
 ---
 
 ## License
 
-This project is licensed under the MIT License.
+MIT
