@@ -1,4 +1,4 @@
-import { Feather } from "@expo/vector-icons";
+import { Feather, MaterialCommunityIcons } from "@expo/vector-icons";
 import { View, StyleSheet } from "react-native";
 import { LinearGradient } from "expo-linear-gradient";
 import { useTranslation } from "react-i18next";
@@ -39,10 +39,9 @@ export default function UserStatsCard({
       </AppText>
 
       <View style={styles.statsRow}>
-        {/* Streak */}
         <View style={styles.statItem}>
           <View style={[styles.iconBox, { backgroundColor: C.backgroundSubtle }]}>
-            <Feather name="zap" size={24} color={C.gold} />
+            <MaterialCommunityIcons name="fire" size={24} color={C.gold} />
           </View>
           <AppText weight="Bold" variant='titleLarge' style={[styles.statValue, { color: C.gold }]}>
             {streak}
@@ -52,10 +51,9 @@ export default function UserStatsCard({
           </AppText>
         </View>
 
-        {/* Total Completed */}
         <View style={styles.statItem}>
           <View style={[styles.iconBox, { backgroundColor: C.backgroundSubtle }]}>
-            <Feather name="check-circle" size={24} color={C.gold} />
+            <Feather name="check-circle" size={22} color={C.gold} />
           </View>
           <AppText weight="Bold" variant='titleLarge' style={[styles.statValue, { color: C.gold }]}>
             {totalCompleted}
@@ -65,7 +63,6 @@ export default function UserStatsCard({
           </AppText>
         </View>
 
-        {/* Journal Entries */}
         <View style={styles.statItem}>
           <View style={[styles.iconBox, { backgroundColor: C.backgroundSubtle }]}>
             <Feather name="book-open" size={24} color={C.gold} />

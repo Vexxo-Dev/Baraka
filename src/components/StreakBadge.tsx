@@ -1,4 +1,4 @@
-import { Feather } from "@expo/vector-icons";
+import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { StyleSheet, View } from "react-native";
 import { useTranslation } from "react-i18next";
 import { useTheme } from "@context/ThemeContext";
@@ -14,7 +14,7 @@ export default function StreakBadge({ streak }: Props) {
 
   return (
     <View style={[styles.container, { backgroundColor: C.goldLight, borderColor: C.gold, borderWidth: 1 }]}>
-      <Feather name="zap" size={14} color={C.gold} />
+      <MaterialCommunityIcons name="fire" size={16} color={C.gold} />
       <AppText weight="Bold" variant='bodyLarge' style={{ color: C.gold }}>
         {streak}
       </AppText>

@@ -1,5 +1,5 @@
 import { AppButton } from "@components/UI/AppButton";
-import { Feather } from "@expo/vector-icons";
+import { AppIcon } from "@components/UI/AppIcon";
 import { router } from "expo-router";
 import React, { useCallback, useState } from "react";
 import { useTranslation } from "react-i18next";
@@ -88,7 +88,12 @@ export default function OnboardingPager() {
             <View
               style={[styles.iconCircle, { backgroundColor: C.gold + "18" }]}
             >
-              <Feather name={item.icon as any} size={48} color={C.gold} />
+              <AppIcon
+                family={item.iconFamily}
+                name={item.icon as never}
+                size={48}
+                color={C.gold}
+              />
             </View>
             {index === 0 && (
               <View style={styles.languagePickerInline}>

@@ -1,4 +1,4 @@
-import { Feather } from "@expo/vector-icons";
+import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { LinearGradient } from "expo-linear-gradient";
 import { useTranslation } from "react-i18next";
 import {
@@ -108,7 +108,7 @@ export default function EducationDetail({
             { backgroundColor: C.successLight, borderColor: C.tint + "30" },
           ]}
         >
-          <Feather name='book-open' size={16} color={C.tint} />
+          <MaterialCommunityIcons name='format-quote-open' size={16} color={C.tint} />
           <View style={{ flex: 1 }}>
             <AppText weight='Bold' variant='caption' style={{ color: C.tint }}>
               {t("common.source")}

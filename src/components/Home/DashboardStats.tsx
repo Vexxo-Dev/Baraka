@@ -1,4 +1,4 @@
-import { Feather } from "@expo/vector-icons";
+import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { View, StyleSheet } from "react-native";
 import { useTranslation } from "react-i18next";
 import { AppText } from "@components/UI/AppText";
@@ -85,7 +85,7 @@ export default function DashboardStats({
             { backgroundColor: isDark ? C.gold + "22" : C.gold + "33" },
           ]}
         >
-          <Feather name='zap' size={18} color={C.gold} />
+          <MaterialCommunityIcons name='fire' size={20} color={C.gold} />
         </View>
         <View style={styles.statInfo}>
           <AppText weight='Bold' variant='title' style={[styles.statValue, { color: C.gold }]}>

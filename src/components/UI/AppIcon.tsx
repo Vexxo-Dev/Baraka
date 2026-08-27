@@ -1,17 +1,29 @@
 import { I18nManager, StyleProp, TextStyle } from 'react-native';
-import { Feather } from '@expo/vector-icons';
+import { Feather, MaterialCommunityIcons, Ionicons } from '@expo/vector-icons';
 
 export type FeatherIconName = keyof typeof Feather.glyphMap;
+export type MaterialCommunityIconName = keyof typeof MaterialCommunityIcons.glyphMap;
+export type IoniconName = keyof typeof Ionicons.glyphMap;
+
+export type AppIconFamily = 'feather' | 'materialCommunity' | 'ionicons';
 
 interface AppIconProps {
-  name: FeatherIconName;
+  family?: AppIconFamily;
+  name: FeatherIconName | MaterialCommunityIconName | IoniconName;
   size?: number;
   color?: string;
   style?: StyleProp<TextStyle>;
   flipRTL?: boolean;
 }
 
+const ICON_COMPONENTS = {
+  feather: Feather,
+  materialCommunity: MaterialCommunityIcons,
+  ionicons: Ionicons,
+} as const;
+
 export function AppIcon({
+  family = 'feather',
   name,
   size = 24,
   color,
@@ -20,10 +32,11 @@ export function AppIcon({
   ...props
 }: AppIconProps) {
   const needsFlip = flipRTL && I18nManager.isRTL;
+  const IconComponent = ICON_COMPONENTS[family];
 
   return (
-    <Feather
-      name={name}
+    <IconComponent
+      name={name as never}
       size={size}
       color={color}
       style={[needsFlip && { transform: [{ scaleX: -1 }] }, style]}

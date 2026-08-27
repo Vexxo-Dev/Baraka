@@ -102,7 +102,7 @@ export default memo(function CategorySection({
       >
         <View style={styles.headerLeft}>
           <AppIcon
-            name={getCategoryIcon(category)}
+            {...getCategoryIcon(category)}
             size={14}
             color={C.textSecondary}
           />

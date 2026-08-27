@@ -69,7 +69,7 @@ export default memo(function EducationCard({
       </AppText>
       <View style={styles.eduFooter}>
         <View style={styles.sourceRow}>
-          <Feather name='book-open' size={11} color={C.tint} />
+          <Feather family='materialCommunity' name='format-quote-open' size={11} color={C.tint} />
           <AppText weight='Regular' variant='caption' style={{ color: C.tint }}>
             {entry.source}
           </AppText>

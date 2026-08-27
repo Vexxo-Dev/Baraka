@@ -1,4 +1,4 @@
-import { Feather } from "@expo/vector-icons";
+import { Feather, MaterialCommunityIcons } from "@expo/vector-icons";
 import { Tabs } from "expo-router";
 import { SymbolView } from "expo-symbols";
 import { useTranslation } from "react-i18next";
@@ -60,7 +60,7 @@ export default function TabLayout() {
             isIOS ? (
               <SymbolView name="house" tintColor={color} size={24} />
             ) : (
-              <Feather name="home" size={22} color={color} />
+              <MaterialCommunityIcons name="white-balance-sunny" size={22} color={color} />
             ),
         }}
       />
@@ -73,7 +73,7 @@ export default function TabLayout() {
             isIOS ? (
               <SymbolView name="book" tintColor={color} size={24} />
             ) : (
-              <Feather name="book-open" size={22} color={color} />
+              <MaterialCommunityIcons name="book-open-variant" size={22} color={color} />
             ),
         }}
       />
@@ -97,7 +97,7 @@ export default function TabLayout() {
             isIOS ? (
               <SymbolView name="gearshape" tintColor={color} size={24} />
             ) : (
-              <Feather name="settings" size={22} color={color} />
+              <MaterialCommunityIcons name="cog-outline" size={22} color={color} />
             ),
         }}
       />
