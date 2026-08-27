@@ -25,7 +25,8 @@ import { getAnonymousUserId, reloadApp } from "@/utils/device";
 import { Platform } from "react-native";
 import { KeyboardProvider } from "react-native-keyboard-controller";
 import { useMigrations } from "drizzle-orm/expo-sqlite/migrator";
-import { db } from "@/db/db";
+import { useDrizzleStudio } from "expo-drizzle-studio-plugin";
+import { db, expoDb } from "@/db/db";
 import { migrations } from "@/db/migrations";
 import { seedIfNeeded } from "@/db/seed";
 import { RootNavigator } from "@/navigation/RootNavigator";
@@ -71,8 +72,8 @@ Sentry.init({
   spotlight: __DEV__,
 });
 
-
 function App() {
+  useDrizzleStudio(__DEV__ ? expoDb : null);
   const [i18nReady, setI18nReady] = useState(false);
   const isLoading = useSettingsStore((s) => s.isLoading);
   const { success: migrationsSuccess, error: migrationsError } = useMigrations(
