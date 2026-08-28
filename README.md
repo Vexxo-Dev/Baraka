@@ -134,12 +134,10 @@ What's already built is covered above in [Overview](#overview) and [Architecture
 - [ ] Per-activity reminders and prayer-time auto-detection (v2)
 - [ ] Multi-source niyyah evidencing (Qur'an/athar/scholar citations alongside hadith — data model already in place)
 - [ ] More content — additional verified activities and learn/niyyah entries
-- [ ] Bottom sheet and toggle UI polish
 - [ ] Native Android widgets
 - [ ] In-app feedback channel
 - [ ] Basic user insights (streak trends, completion history)
 - [ ] CSV/PDF export
-- [ ] Custom activity rename/delete
 - [ ] ESLint + Prettier + pre-commit enforcement
 - [ ] OTA updates via EAS Update, so JS-only fixes don't wait on a full store review
 
