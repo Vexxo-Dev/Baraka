@@ -1,7 +1,8 @@
 import { memo, useCallback, useState, useEffect } from "react";
-import { View, StyleSheet, Switch } from "react-native";
+import { View, StyleSheet } from "react-native";
 import { getCategoryIcon, getCategoryLabel } from "@utils/categories";
 import { AppIcon } from "@components/UI/AppIcon";
+import { AppSwitch } from "@components/UI/AppSwitch";
 import { useTranslation } from "react-i18next";
 import { AppText } from "@components/UI/AppText";
 import type { DbUserActivity } from "@hooks/db/useActivities";
@@ -43,13 +44,7 @@ const ActivityRow = memo(
             {activity.name}
           </AppText>
         </View>
-        <Switch
-          value={activity.enabled}
-          onValueChange={handleToggle}
-          trackColor={{ false: C.border, true: C.tint + "80" }}
-          thumbColor={activity.enabled ? C.tint : C.textMuted}
-          ios_backgroundColor={C.border}
-        />
+        <AppSwitch value={activity.enabled} onValueChange={handleToggle} />
       </View>
     );
   },

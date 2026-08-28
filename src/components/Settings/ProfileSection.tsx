@@ -1,8 +1,9 @@
 import React from "react";
-import { View, StyleSheet, Switch } from "react-native";
+import { View, StyleSheet } from "react-native";
 import { useTranslation } from "react-i18next";
 import { useTheme } from "@context/ThemeContext";
 import { AppText } from "@components/UI/AppText";
+import { AppSwitch } from "@components/UI/AppSwitch";
 import SettingRow from "./SettingRow";
 import { ROLES, type RoleKey } from "@utils/roleHelpers";
 import { spacing } from "@constants/spacing";
@@ -49,12 +50,9 @@ export const ProfileSection = React.memo(({ profile, onToggle }: ProfileSectionP
               label={t(opt.labelKey)}
               desc={t(opt.descKey)}
               right={
-                <Switch
+                <AppSwitch
                   value={profile[opt.key]}
                   onValueChange={() => onToggle(opt.key)}
-                  trackColor={{ false: C.border, true: C.tint + "80" }}
-                  thumbColor={profile[opt.key] ? C.tint : C.textMuted}
-                  ios_backgroundColor={C.border}
                 />
               }
             />

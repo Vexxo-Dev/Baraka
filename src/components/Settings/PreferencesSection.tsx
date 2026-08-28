@@ -1,9 +1,10 @@
 import React from "react";
-import { View, StyleSheet, Switch } from "react-native";
+import { View, StyleSheet } from "react-native";
 import { useTranslation } from "react-i18next";
 import { useTheme } from "@context/ThemeContext";
 import { AppText } from "@components/UI/AppText";
 import { AnimatedPressable } from "@components/UI/AnimatedPressable";
+import { AppSwitch } from "@components/UI/AppSwitch";
 import { AppIcon as Feather } from "@components/UI/AppIcon";
 import SettingRow from "./SettingRow";
 import { spacing } from "@constants/spacing";
@@ -108,13 +109,10 @@ export const PreferencesSection = React.memo(
             label={t("settings.notifications")}
             desc={t("settings.notificationsDesc")}
             right={
-              <Switch
+              <AppSwitch
                 value={notificationsActive}
                 onValueChange={onNotificationToggle}
                 disabled={notificationsToggling}
-                trackColor={{ false: C.border, true: C.tint + "80" }}
-                thumbColor={notificationsActive ? C.tint : C.textMuted}
-                ios_backgroundColor={C.border}
               />
             }
           />
@@ -162,13 +160,10 @@ export const PreferencesSection = React.memo(
             label={t("settings.streakNotifications")}
             desc={t("settings.streakNotificationsDesc")}
             right={
-              <Switch
+              <AppSwitch
                 value={streakNotificationsActive}
                 onValueChange={onStreakNotificationToggle}
                 disabled={streakNotificationsToggling}
-                trackColor={{ false: C.border, true: C.tint + "80" }}
-                thumbColor={streakNotificationsActive ? C.tint : C.textMuted}
-                ios_backgroundColor={C.border}
               />
             }
           />
