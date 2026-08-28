@@ -1,8 +1,7 @@
-import { memo, useCallback, useState, useEffect } from "react";
+import { memo, useState, useEffect } from "react";
 import { View, StyleSheet } from "react-native";
 import { getCategoryIcon, getCategoryLabel } from "@utils/categories";
 import { AppIcon } from "@components/UI/AppIcon";
-import { AppSwitch } from "@components/UI/AppSwitch";
 import { useTranslation } from "react-i18next";
 import { AppText } from "@components/UI/AppText";
 import type { DbUserActivity } from "@hooks/db/useActivities";
@@ -20,40 +19,13 @@ import Animated, {
   withTiming,
 } from "react-native-reanimated";
 
-
-interface ActivityRowProps {
-  activity: DbUserActivity;
-  onToggle: (activity: DbUserActivity) => void;
-  colors: any;
-}
-
-const ActivityRow = memo(
-  ({ activity, onToggle, colors: C }: ActivityRowProps) => {
-    const handleToggle = useCallback(() => {
-      onToggle(activity);
-    }, [activity, onToggle]);
-
-    return (
-      <View style={styles.activityRow}>
-        <View style={styles.activityInfo}>
-          <AppText
-            weight='Medium'
-            variant='bodyLarge'
-            style={{ color: C.text }}
-          >
-            {activity.name}
-          </AppText>
-        </View>
-        <AppSwitch value={activity.enabled} onValueChange={handleToggle} />
-      </View>
-    );
-  },
-);
+import { ActivityRow } from "./ActivityRow";
 
 interface CategorySectionProps {
   category: string;
   categoryActivities: DbUserActivity[];
   onToggleActivity: (activity: DbUserActivity) => void;
+  onManageActivity: (activity: DbUserActivity) => void;
   isRecentlyToggled?: boolean;
 }
 
@@ -61,6 +33,7 @@ export default memo(function CategorySection({
   category,
   categoryActivities,
   onToggleActivity,
+  onManageActivity,
   isRecentlyToggled,
 }: CategorySectionProps) {
   const { t } = useTranslation();
@@ -90,7 +63,10 @@ export default memo(function CategorySection({
   });
 
   return (
-    <Animated.View style={styles.categorySection} layout={LinearTransition.duration(250)}>
+    <Animated.View
+      style={styles.categorySection}
+      layout={LinearTransition.duration(250)}
+    >
       <AnimatedPressable
         onPress={() => setIsExpanded(!isExpanded)}
         style={styles.categoryHeader}
@@ -110,11 +86,7 @@ export default memo(function CategorySection({
           </AppText>
         </View>
         <Animated.View style={chevronStyle}>
-          <Feather
-            name="chevron-down"
-            size={16}
-            color={C.textSecondary}
-          />
+          <Feather name='chevron-down' size={16} color={C.textSecondary} />
         </Animated.View>
       </AnimatedPressable>
 
@@ -132,6 +104,7 @@ export default memo(function CategorySection({
               <ActivityRow
                 activity={activity}
                 onToggle={onToggleActivity}
+                onManage={onManageActivity}
                 colors={C}
               />
               {index < categoryActivities.length - 1 && (
@@ -169,12 +142,5 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     overflow: "hidden",
   },
-  activityRow: {
-    flexDirection: "row",
-    alignItems: "center",
-    padding: spacing.md,
-    gap: spacing.md,
-  },
-  activityInfo: { flex: 1, gap: spacing.xs },
-  divider: { height: 1, marginLeft: spacing.md },
+  divider: { height: 1, marginStart: spacing.md },
 });

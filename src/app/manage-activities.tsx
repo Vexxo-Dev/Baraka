@@ -6,7 +6,7 @@ import { AppIcon } from "@components/UI/AppIcon";
 import { useAllActivities, type DbUserActivity } from "@hooks/db/useActivities";
 import { useActivityActions } from "@hooks/db/useActivityActions";
 import { Haptic } from "@utils/haptics";
-import { useState, useMemo, useCallback } from "react";
+import { useState, useMemo, useCallback, useRef } from "react";
 import { useTranslation } from "react-i18next";
 import { StyleSheet, View } from "react-native";
 import { KeyboardAwareScrollViewCompat } from "@components/KeyboardAwareScrollViewCompat";
@@ -15,6 +15,8 @@ import { router } from "expo-router";
 
 import AddActivityForm from "@components/Activities/AddActivityForm";
 import CategorySection from "@components/Activities/CategorySection";
+import { ManageCustomActivitySheet } from "@components/Activities/ManageCustomActivitySheet";
+import type { BottomSheetModal } from "@gorhom/bottom-sheet";
 import Animated, { FadeInDown } from "react-native-reanimated";
 import { spacing } from "@constants/spacing";
 import { radius } from "@constants/radius";
@@ -25,9 +27,17 @@ export default function ManageActivitiesScreen() {
   const insets = useSafeAreaInsets();
 
   const { activities } = useAllActivities();
-  const { toggleActivity } = useActivityActions();
+  const { toggleActivity, updateCustomActivityName, deleteCustomActivity } =
+    useActivityActions();
   const [showAddForm, setShowAddForm] = useState(false);
-  const [lastToggledCategory, setLastToggledCategory] = useState<string | null>(null);
+  const [lastToggledCategory, setLastToggledCategory] = useState<string | null>(
+    null,
+  );
+
+  const manageSheetRef = useRef<BottomSheetModal>(null);
+  const [managedActivity, setManagedActivity] = useState<DbUserActivity | null>(
+    null,
+  );
 
   const categoryGroups = useMemo(() => {
     const cats = [...new Set(activities.map((a) => a.category))];
@@ -46,6 +56,12 @@ export default function ManageActivitiesScreen() {
     [toggleActivity],
   );
 
+  const handleManage = useCallback((activity: DbUserActivity) => {
+    Haptic.selection();
+    setManagedActivity(activity);
+    manageSheetRef.current?.present();
+  }, []);
+
   const topPadding = insets.top;
 
   return (
@@ -53,10 +69,13 @@ export default function ManageActivitiesScreen() {
       <KeyboardAwareScrollViewCompat
         contentContainerStyle={[
           styles.scrollContent,
-          { paddingTop: topPadding + spacing.lg, paddingBottom: insets.bottom + spacing.xxl },
+          {
+            paddingTop: topPadding + spacing.lg,
+            paddingBottom: insets.bottom + spacing.xxl,
+          },
         ]}
         showsVerticalScrollIndicator={false}
-        keyboardShouldPersistTaps="handled"
+        keyboardShouldPersistTaps='handled'
       >
         <AnimatedPressable
           onPress={() => router.back()}
@@ -65,12 +84,16 @@ export default function ManageActivitiesScreen() {
             { backgroundColor: C.backgroundSubtle, borderColor: C.border },
           ]}
         >
-          <AppIcon name="chevron-left" size={24} color={C.text} flipRTL />
+          <AppIcon name='chevron-left' size={24} color={C.text} flipRTL />
         </AnimatedPressable>
 
         <View style={styles.header}>
           <View>
-            <AppText weight='Bold' variant='hero' style={[styles.title, { color: C.gold }]}>
+            <AppText
+              weight='Bold'
+              variant='hero'
+              style={[styles.title, { color: C.gold }]}
+            >
               {t("manageActivities.title")}
             </AppText>
             <AppText
@@ -108,12 +131,21 @@ export default function ManageActivitiesScreen() {
                 category={group.category}
                 categoryActivities={group.activities}
                 onToggleActivity={handleToggle}
+                onManageActivity={handleManage}
                 isRecentlyToggled={lastToggledCategory === group.category}
               />
             </Animated.View>
           );
         })}
       </KeyboardAwareScrollViewCompat>
+
+      <ManageCustomActivitySheet
+        ref={manageSheetRef}
+        activity={managedActivity}
+        onRename={updateCustomActivityName}
+        onDelete={deleteCustomActivity}
+        onClose={() => manageSheetRef.current?.dismiss()}
+      />
     </View>
   );
 }

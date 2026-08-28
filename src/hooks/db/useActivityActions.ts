@@ -1,5 +1,5 @@
 import { useCallback } from "react";
-import { eq, sql } from "drizzle-orm";
+import { eq, sql, inArray } from "drizzle-orm";
 import { db } from "@/db/db";
 import {
   activities,
@@ -97,6 +97,40 @@ export function useActivityActions() {
     [],
   );
 
+  const updateCustomActivityName = useCallback(
+    async (activityId: string, name: string) => {
+      await db
+        .update(customActivities)
+        .set({ nameEn: name, nameAr: name })
+        .where(eq(customActivities.id, activityId));
+    },
+    [],
+  );
+
+  const deleteCustomActivity = useCallback(async (activityId: string) => {
+    await db.transaction(async (tx) => {
+      const optionIds = (
+        await tx
+          .select({ id: customNiyyahOptions.id })
+          .from(customNiyyahOptions)
+          .where(eq(customNiyyahOptions.activityId, activityId))
+      ).map((r) => r.id);
+
+      if (optionIds.length > 0) {
+        await tx
+          .delete(dailyLogNiyyahs)
+          .where(inArray(dailyLogNiyyahs.niyyahId, optionIds));
+        await tx
+          .delete(customNiyyahOptions)
+          .where(eq(customNiyyahOptions.activityId, activityId));
+      }
+
+      await tx
+        .delete(customActivities)
+        .where(eq(customActivities.id, activityId));
+    });
+  }, []);
+
   const addCustomNiyyahOption = useCallback(
     async (activityId: string, textEn: string, textAr: string) => {
       const id = generateCustomId();
@@ -129,6 +163,8 @@ export function useActivityActions() {
     updateActivityPrefs,
     addCustomActivity,
     updateCustomActivityNiyyahText,
+    updateCustomActivityName,
+    deleteCustomActivity,
     addCustomNiyyahOption,
     deleteCustomNiyyahOption,
   };
