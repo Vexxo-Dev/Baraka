@@ -40,7 +40,7 @@ export default function DashboardStats({
       >
         <ProgressRing
           percentage={completionRate}
-          size={44}
+          size={48}
           color={C.gold}
           strokeWidth={4}
         />
@@ -85,7 +85,7 @@ export default function DashboardStats({
             { backgroundColor: isDark ? C.gold + "22" : C.gold + "33" },
           ]}
         >
-          <MaterialCommunityIcons name='fire' size={20} color={C.gold} />
+          <MaterialCommunityIcons name='fire' size={28} color={C.gold} />
         </View>
         <View style={styles.statInfo}>
           <AppText weight='Bold' variant='title' style={[styles.statValue, { color: C.gold }]}>
