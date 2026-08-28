@@ -85,7 +85,7 @@ export const PreferencesSection = React.memo(
                   <AppText
                     weight='Medium'
                     variant='body'
-                    style={{ color: C.textSecondary, marginRight: spacing.xs }}
+                    style={{ color: C.textSecondary, marginEnd: spacing.xs }}
                   >
                     {lang === "en" ? "English" : "عربي"}
                   </AppText>
@@ -223,7 +223,7 @@ const styles = StyleSheet.create({
     textTransform: "uppercase",
     letterSpacing: 1,
     marginBottom: spacing.sm,
-    marginLeft: spacing.xs,
+    marginStart: spacing.xs,
     marginTop: spacing.sm,
   },
   settingsCard: {

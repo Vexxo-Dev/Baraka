@@ -102,6 +102,6 @@ const styles = StyleSheet.create({
     justifyContent: "center",
   },
   icon: {
-    marginRight: spacing.xs,
+    marginEnd: spacing.xs,
   },
 });

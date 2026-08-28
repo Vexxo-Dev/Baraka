@@ -68,12 +68,12 @@ const styles = StyleSheet.create({
     textTransform: "uppercase",
     letterSpacing: 1,
     marginBottom: spacing.sm,
-    marginLeft: spacing.xs,
+    marginStart: spacing.xs,
     marginTop: spacing.xxl,
   },
   sectionSubLabel: {
     marginBottom: spacing.md,
-    marginLeft: spacing.xs,
+    marginStart: spacing.xs,
   },
   settingsCard: {
     borderRadius: radius.lg,

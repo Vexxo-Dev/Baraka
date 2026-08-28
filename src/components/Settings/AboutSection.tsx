@@ -88,7 +88,7 @@ OS: ${Platform.OS} ${Platform.Version}
         </View>
       </View>
 
-      <AppText weight='Bold' style={[styles.sectionLabel, { color: C.gold }]}>
+      <AppText weight='Bold' variant='bodyLarge' style={[styles.sectionLabel, { color: C.gold }]}>
         {t("settings.support")}
       </AppText>
       <View
@@ -191,7 +191,7 @@ const styles = StyleSheet.create({
     textTransform: "uppercase",
     letterSpacing: 1,
     marginBottom: spacing.sm,
-    marginLeft: spacing.xs,
+    marginStart: spacing.xs,
     marginTop: spacing.sm,
   },
   settingsCard: {

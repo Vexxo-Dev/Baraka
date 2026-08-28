@@ -73,5 +73,5 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
   },
-  settingDesc: { marginTop: spacing.xs },
+  settingDesc: { marginTop: spacing.xs, marginEnd: spacing.md, lineHeight: 16 },
 });
