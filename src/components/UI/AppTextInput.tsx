@@ -1,5 +1,6 @@
 import React, { useState, useMemo } from "react";
 import { TextInput, TextInputProps, StyleSheet, View } from "react-native";
+import { BottomSheetTextInput } from "@gorhom/bottom-sheet";
 import { useTheme } from "@context/ThemeContext";
 import { AppText } from "./AppText";
 import { Feather } from "@expo/vector-icons";
@@ -13,6 +14,13 @@ interface AppTextInputProps extends TextInputProps {
   error?: string;
   leftIcon?: keyof typeof Feather.glyphMap;
   rightIcon?: React.ReactNode;
+  /**
+   * Set when this input renders inside a BottomSheetModal. Gorhom's bottom
+   * sheet only tracks keyboard height/target via its own BottomSheetTextInput
+   * (see BottomSheetTextInput's onFocus) - a plain RN TextInput never
+   * registers as a target, so the sheet's keyboard-avoidance never fires.
+   */
+  bottomSheet?: boolean;
 }
 
 export function AppTextInput({
@@ -23,11 +31,13 @@ export function AppTextInput({
   rightIcon,
   onFocus,
   onBlur,
+  bottomSheet,
   ...props
 }: AppTextInputProps) {
   const { colors: C } = useTheme();
   const { language } = useLanguage();
   const [isFocused, setIsFocused] = useState(false);
+  const BaseInputField = bottomSheet ? BottomSheetTextInput : TextInput;
 
   const handleFocus: TextInputProps["onFocus"] = (e) => {
     setIsFocused(true);
@@ -73,14 +83,14 @@ export function AppTextInput({
             style={styles.leftIcon}
           />
         )}
-        <TextInput
+        <BaseInputField
           style={[
             styles.input,
             dynamicStyle,
             props.multiline && styles.multiline,
             leftIcon ? styles.withLeftIcon : undefined,
             rightIcon ? styles.withRightIcon : undefined,
-            style
+            style,
           ]}
           placeholderTextColor={C.textMuted}
           onFocus={handleFocus}
@@ -108,7 +118,7 @@ const styles = StyleSheet.create({
   },
   label: {
     marginBottom: spacing.sm,
-    marginLeft: spacing.xs,
+    marginStart: spacing.xs,
   },
   inputContainer: {
     position: "relative",
@@ -123,12 +133,12 @@ const styles = StyleSheet.create({
   },
   leftIcon: {
     position: "absolute",
-    left: spacing.lg,
+    start: spacing.lg,
     zIndex: 1,
   },
   rightIconContainer: {
     position: "absolute",
-    right: spacing.lg,
+    end: spacing.lg,
     zIndex: 1,
   },
   multiline: {
@@ -138,7 +148,7 @@ const styles = StyleSheet.create({
   },
   error: {
     marginTop: spacing.xs,
-    marginLeft: spacing.xs,
+    marginStart: spacing.xs,
   },
   withLeftIcon: { paddingStart: 42 },
   withRightIcon: { paddingEnd: 42 },

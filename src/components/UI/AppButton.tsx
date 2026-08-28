@@ -126,7 +126,13 @@ export function AppButton({
           {icon && (
             <Feather name={icon} size={18} color={v.icon} style={styles.icon} />
           )}
-          <AppText weight='Bold' variant='bodyLarge' style={v.text}>
+          <AppText
+            weight='Bold'
+            variant='bodyLarge'
+            style={[v.text, { textAlign: "center" }]}
+            numberOfLines={1}
+            adjustsFontSizeToFit
+          >
             {label}
           </AppText>
         </View>
@@ -149,7 +155,7 @@ const styles = StyleSheet.create({
     justifyContent: "center",
   },
   icon: {
-    marginRight: spacing.sm,
+    marginEnd: spacing.sm,
   },
   disabled: {
     opacity: 0.5,
