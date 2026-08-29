@@ -101,8 +101,14 @@ bunx expo run:android   # or: bunx expo run:ios
 ```bash
 npm run typecheck   # tsc --noEmit
 npm test            # jest
-npm run db:studio   # inspect the local SQLite DB via Drizzle Studio
+npm run db:generate # drizzle-kit generate, after any schema.ts change
 bunx expo prebuild --clean   # after any native config change
+
+# Inspect the live on-device SQLite DB: run `bunx expo start`, then press
+# shift+m in that terminal and choose "expo-drizzle-studio-plugin" from the
+# dev tools menu — opens Drizzle Studio in a browser, connected to the
+# running app's real database. (`drizzle-kit studio` does not work here —
+# it expects a local DB file/connection, not an app-sandboxed Expo SQLite DB.)
 ```
 
 ---
