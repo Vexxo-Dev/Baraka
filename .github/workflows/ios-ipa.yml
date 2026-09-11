@@ -12,8 +12,8 @@ concurrency:
 
 jobs:
   build-ios:
-    name: Build signed IPA
-    runs-on: ubuntu-latest
+    name: Build unsigned IPA for AltStore
+    runs-on: macos-latest
     permissions:
       contents: read
 
@@ -29,20 +29,31 @@ jobs:
       - name: Install dependencies
         run: bun install --frozen-lockfile
 
-      - name: Set up EAS CLI
-        run: bunx eas-cli@latest --version
+      - name: Generate native iOS project
+        run: bunx expo prebuild --platform ios --no-install
 
-      - name: Build iOS IPA with EAS
-        env:
-          EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
-        run: bunx eas-cli@latest build --platform ios --profile preview --non-interactive --wait
+      - name: Install CocoaPods dependencies
+        run: pod install --project-directory=ios
 
-      - name: Download IPA
-        env:
-          EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
+      - name: Build unsigned iOS app
         run: |
-          mkdir -p artifacts
-          bunx eas-cli@latest build:download --platform ios --profile preview --latest --output artifacts/Baraka.ipa
+          xcodebuild \
+            -workspace ios/Baraka.xcworkspace \
+            -scheme Baraka \
+            -configuration Release \
+            -sdk iphoneos \
+            -destination 'generic/platform=iOS' \
+            -derivedDataPath build \
+            CODE_SIGNING_ALLOWED=NO \
+            CODE_SIGNING_REQUIRED=NO \
+            CODE_SIGN_IDENTITY='' \
+            build
+
+      - name: Package unsigned IPA
+        run: |
+          mkdir -p artifacts/Payload
+          cp -R build/Build/Products/Release-iphoneos/Baraka.app artifacts/Payload/
+          ditto -c -k --sequesterRsrc --keepParent artifacts/Payload artifacts/Baraka.ipa
 
       - name: Upload IPA artifact
         uses: actions/upload-artifact@v4
