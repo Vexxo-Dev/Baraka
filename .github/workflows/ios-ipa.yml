@@ -16,6 +16,9 @@ jobs:
     runs-on: macos-latest
     permissions:
       contents: read
+    env:
+      NODE_ENV: production
+      SENTRY_DISABLE_AUTO_UPLOAD: "true"
 
     steps:
       - name: Check out repository
