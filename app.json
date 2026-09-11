@@ -80,8 +80,9 @@
       "supportsRTL": true,
       "router": {},
       "eas": {
-        "projectId": "cc6d34eb-dfa5-442c-86de-d1b3358a0246"
+        "projectId": "87e2aa04-4882-4d3d-a0e9-90386fe139cd"
       }
-    }
+    },
+    "owner": "vexxodev"
   }
 }
