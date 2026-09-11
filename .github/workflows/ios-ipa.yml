@@ -1,0 +1,53 @@
+name: Build iOS IPA
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - main
+
+concurrency:
+  group: ios-ipa-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build-ios:
+    name: Build signed IPA
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up Bun
+        uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: latest
+
+      - name: Install dependencies
+        run: bun install --frozen-lockfile
+
+      - name: Set up EAS CLI
+        run: bunx eas-cli@latest --version
+
+      - name: Build iOS IPA with EAS
+        env:
+          EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
+        run: bunx eas-cli@latest build --platform ios --profile preview --non-interactive --wait
+
+      - name: Download IPA
+        env:
+          EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
+        run: |
+          mkdir -p artifacts
+          bunx eas-cli@latest build:download --platform ios --profile preview --latest --output artifacts/Baraka.ipa
+
+      - name: Upload IPA artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: Baraka-ios-${{ github.sha }}
+          path: artifacts/Baraka.ipa
+          if-no-files-found: error
+          retention-days: 14

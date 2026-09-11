@@ -111,6 +111,19 @@ bunx expo prebuild --clean   # after any native config change
 # it expects a local DB file/connection, not an app-sandboxed Expo SQLite DB.)
 ```
 
+### iOS IPA via GitHub Actions
+
+The `Build iOS IPA` workflow builds a signed ad hoc IPA with the EAS `preview`
+profile and uploads it as a GitHub Actions artifact. Run it manually from the
+Actions tab or push to `main`, then download the `Baraka-ios-*` artifact and
+open the IPA with iLoader.
+
+Before running it, create an Expo access token and add it to the repository as
+the `EXPO_TOKEN` Actions secret. The EAS account must also have iOS
+credentials configured, and every device that will install the ad hoc build
+must be registered with the Apple Developer provisioning profile. Registering
+a new device requires creating a fresh build so the profile includes its UDID.
+
 ---
 
 ## Project Structure
