@@ -8,7 +8,8 @@
     "scheme": "baraka",
     "userInterfaceStyle": "automatic",
     "ios": {
-      "supportsTablet": false
+      "supportsTablet": false,
+      "bundleIdentifier": "com.vexxodev.barakaniyyah"
     },
     "android": {
       "adaptiveIcon": {
