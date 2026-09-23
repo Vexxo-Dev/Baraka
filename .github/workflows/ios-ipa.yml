@@ -36,6 +36,9 @@ jobs:
       - name: Generate native iOS project
         run: bunx expo prebuild --platform ios --no-install
 
+      - name: Use JavaScriptCore on iOS
+        run: node -e "const fs=require('fs'); const p='ios/Podfile.properties.json'; const v=JSON.parse(fs.readFileSync(p,'utf8')); v['expo.jsEngine']='jsc'; fs.writeFileSync(p, JSON.stringify(v, null, 2) + '\\n');"
+
       - name: Install CocoaPods dependencies
         run: pod install --project-directory=ios
 
