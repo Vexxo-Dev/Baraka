@@ -35,8 +35,6 @@ const applyRTL = (lng: string) => {
   I18nManager.forceRTL(isRTL);
 };
 
-export let needsRTLReload = false;
-
 function syncInitialRTL() {
   let lang: AppLanguage = FALLBACK;
 
@@ -49,7 +47,6 @@ function syncInitialRTL() {
 
   if (I18nManager.isRTL !== isRTL) {
     applyRTL(lang);
-    needsRTLReload = true;
   }
 }
 

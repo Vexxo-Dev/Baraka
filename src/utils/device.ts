@@ -21,8 +21,10 @@ export const reloadApp = async () => {
   try {
     if (__DEV__) {
       DevSettings.reload();
-    } else {
+    } else if (Updates.isEnabled) {
       await Updates.reloadAsync();
     }
-  } catch {}
+  } catch {} finally {
+    isReloading = false;
+  }
 };

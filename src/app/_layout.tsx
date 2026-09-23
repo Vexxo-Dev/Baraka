@@ -1,4 +1,4 @@
-import i18n, { needsRTLReload } from "@i18n";
+import i18n from "@i18n";
 import * as Sentry from "@sentry/react-native";
 
 import * as SplashScreen from "expo-splash-screen";
@@ -97,11 +97,6 @@ function App() {
     return () => i18n.off("initialized", onInit);
   }, []);
 
-  useEffect(() => {
-    if (i18nReady && needsRTLReload) {
-      reloadApp();
-    }
-  }, [i18nReady]);
 
   useEffect(() => {
     if (!migrationsSuccess || isLoading) return;
