@@ -19,6 +19,7 @@ jobs:
     env:
       NODE_ENV: production
       SENTRY_DISABLE_AUTO_UPLOAD: "true"
+      RCT_NEW_ARCH_ENABLED: "0"
 
     steps:
       - name: Check out repository
